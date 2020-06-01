@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="MFC">
+      <UniqueIdentifier>{75943f76-c5b2-431c-a226-c63fb33cff60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MFC\Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="MFC\Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="MFC\Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Kanban">
+      <UniqueIdentifier>{085d21f6-c7cf-4d87-b103-bcf50d01a109}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Kanban\Header Files">
+      <UniqueIdentifier>{d2c8537a-f06d-4f20-b513-dcb4d44f8a3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Kanban\Source Files">
+      <UniqueIdentifier>{d17c6e63-e43e-4b2c-bbb5-aefe53b82cfe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildFrm.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC\targetver.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Board.h">
+      <Filter>Kanban\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Card.h">
+      <Filter>Kanban\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Column.h">
+      <Filter>Kanban\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC\KanbanDoc.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC\KanbanView.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC\Kanban.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>MFC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC\ChildFrm.cpp">
+      <Filter>MFC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC\Kanban.cpp">
+      <Filter>MFC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC\KanbanDoc.cpp">
+      <Filter>MFC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC\KanbanView.cpp">
+      <Filter>MFC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC\MainFrm.cpp">
+      <Filter>MFC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Board.cpp">
+      <Filter>Kanban\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Card.cpp">
+      <Filter>Kanban\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Column.cpp">
+      <Filter>Kanban\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Kanban.reg">
+      <Filter>MFC</Filter>
+    </None>
+    <None Include="MFC\res\Kanban.rc2">
+      <Filter>MFC\Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="MFC\res\userimages.bmp">
+      <Filter>MFC\Resource Files</Filter>
+    </Image>
+    <Image Include="MFC\res\Kanban.ico">
+      <Filter>MFC\Resource Files</Filter>
+    </Image>
+    <Image Include="MFC\res\KanbanDoc.ico">
+      <Filter>MFC\Resource Files</Filter>
+    </Image>
+    <Image Include="MFC\res\Toolbar.bmp">
+      <Filter>MFC\Resource Files</Filter>
+    </Image>
+    <Image Include="MFC\res\Toolbar256.bmp">
+      <Filter>MFC\Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MFC\Kanban.rc">
+      <Filter>MFC\Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

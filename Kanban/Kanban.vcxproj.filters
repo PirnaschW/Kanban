@@ -25,6 +25,15 @@
     <Filter Include="Kanban\Source Files">
       <UniqueIdentifier>{d17c6e63-e43e-4b2c-bbb5-aefe53b82cfe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MFC-Disconnect">
+      <UniqueIdentifier>{a9cbedca-71e6-4e3a-95c5-41e4e3cc73a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MFC-Disconnect\Header Files">
+      <UniqueIdentifier>{76197757-f084-4595-b344-cbf6deffa3a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MFC-Disconnect\Source Files">
+      <UniqueIdentifier>{87964d93-b5e2-4103-88ac-3561feba88cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -40,9 +49,6 @@
       <Filter>MFC\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
-      <Filter>MFC\Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MFC\targetver.h">
       <Filter>MFC\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Classes\Board.h">
@@ -62,6 +68,48 @@
     </ClInclude>
     <ClInclude Include="MFC\Kanban.h">
       <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\UIContext.h">
+      <Filter>Kanban\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC-Archive.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC-Archive_cpp.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC-Bitmap.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC-CmdUI.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC-Constants.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC-DC.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC-Message.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC-Point.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC-Rect.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC-Win.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\Classes.h">
+      <Filter>Kanban\Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +138,36 @@
       <Filter>Kanban\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Classes\Column.cpp">
+      <Filter>Kanban\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\UIContext.cpp">
+      <Filter>Kanban\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC-Disconnect\MFC-Archive.cpp">
+      <Filter>MFC-Disconnect\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC-Disconnect\MFC-Bitmap.cpp">
+      <Filter>MFC-Disconnect\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC-Disconnect\MFC-CmdUI.cpp">
+      <Filter>MFC-Disconnect\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC-Disconnect\MFC-Constants.cpp">
+      <Filter>MFC-Disconnect\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC-Disconnect\MFC-DC.cpp">
+      <Filter>MFC-Disconnect\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC-Disconnect\MFC-Message.cpp">
+      <Filter>MFC-Disconnect\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC-Disconnect\MFC-Rect.cpp">
+      <Filter>MFC-Disconnect\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC-Disconnect\MFC-Win.cpp">
+      <Filter>MFC-Disconnect\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\Classes.cpp">
       <Filter>Kanban\Source Files</Filter>
     </ClCompile>
   </ItemGroup>

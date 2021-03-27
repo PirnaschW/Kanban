@@ -4,7 +4,6 @@
 
 #include "pch.h"
 
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -36,8 +35,9 @@ BOOL CKanbanDoc::OnNewDocument()
 
 void CKanbanDoc::Serialize(CArchive& ar)
 {
-	if (ar.IsStoring()) board_->Serialize(ar);
-	else board_ = std::make_unique<Kanban::Board>(ar);
+  MFC::Archive AR(&ar);
+	if (ar.IsStoring()) board_->Serialize(AR);
+	else board_ = std::make_unique<Kanban::Board>(AR);
 }
 
 #ifdef SHARED_HANDLERS

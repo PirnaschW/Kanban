@@ -44,7 +44,7 @@ BOOL CKanbanView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CKanbanView drawing
 
-void CKanbanView::OnDraw(CDC* /*pDC*/)
+void CKanbanView::OnDraw(CDC* pDC)
 {
 	CKanbanDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -52,6 +52,8 @@ void CKanbanView::OnDraw(CDC* /*pDC*/)
 		return;
 
 	// TODO: add draw code for native data here
+  MFC::DC dc(pDC);
+  pDoc->board_->Draw(dc);
 }
 
 

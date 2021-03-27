@@ -3,9 +3,6 @@
 //
 
 
-#pragma once
-
-
 class CKanbanDoc : public CDocument
 {
 protected: // create from serialization only

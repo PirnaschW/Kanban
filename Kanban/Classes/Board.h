@@ -1,4 +1,3 @@
-#pragma once
 
 namespace Kanban
 {
@@ -10,13 +9,18 @@ namespace Kanban
     Board(std::string title = "new Board");
     ~Board(void);
 
-    Board(CArchive& ar);
-    void Serialize(CArchive& ar) const;
+    Board(Archive& ar);
+    void Serialize(Archive& ar) const;
+    void Draw(DC& dc) const;
 
   private:
     std::string title_{};
 
-    std::vector<Column*> column_{};
+    std::vector<std::unique_ptr<Column>> columns_{};
+    std::vector<std::string> owners_{};
+    // filter_
+    double scale_{ 1.0 };
+
   };
 
 }

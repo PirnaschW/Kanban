@@ -12,13 +12,7 @@
 #include "afxwinappex.h"
 #include "afxdialogex.h"
 
-#include <string>
-#include <vector>
-#include <memory>
-
-#include "Classes/Card.h"
-#include "Classes/Column.h"
-#include "Classes/Board.h"
+#include "Classes/Classes.h"
 
 #include "MFC/Kanban.h"
 #include "MFC/MainFrm.h"

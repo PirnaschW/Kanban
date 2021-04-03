@@ -48,9 +48,6 @@
     <ClInclude Include="Resource.h">
       <Filter>MFC\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>MFC\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Classes\Board.h">
       <Filter>Kanban\Header Files</Filter>
     </ClInclude>
@@ -105,17 +102,20 @@
     <ClInclude Include="MFC-Disconnect\MFC-Win.h">
       <Filter>MFC-Disconnect\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>MFC\Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Classes\Classes.h">
       <Filter>Kanban\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MFC-Disconnect\MFC-Doc.h">
+      <Filter>MFC-Disconnect\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC\pch.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MFC\targetver.h">
+      <Filter>MFC\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
-      <Filter>MFC\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MFC\ChildFrm.cpp">
       <Filter>MFC\Source Files</Filter>
     </ClCompile>
@@ -169,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="Classes\Classes.cpp">
       <Filter>Kanban\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MFC\pch.cpp">
+      <Filter>MFC\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

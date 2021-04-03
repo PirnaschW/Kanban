@@ -18,7 +18,7 @@ namespace Kanban
     std::vector<std::unique_ptr<Card>> cards_{};
     size_t wip_limit_{ 0 };
     std::string exit_rule_{};
-    size_t width_{ 1 };
+    size_t width_{ 190U };
   };
 
 }

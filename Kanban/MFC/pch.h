@@ -4,23 +4,27 @@
 // However, files listed here are ALL re-compiled if any one of them is updated between builds.
 // Do not add files here that you will be updating frequently as this negates the performance advantage.
 
-#ifndef PCH_H
-#define PCH_H
+#include <memory>
+#include <string>
+#include <xstring>
+#include <string_view>
 
-// add headers that you want to pre-compile here
-#include "MFC/framework.h"
+#include "framework.h"
 #include "afxwinappex.h"
 #include "afxdialogex.h"
 
-#include "Classes/Classes.h"
+//#include "MFC-Disconnect/MFC.h"
+#include "MFC-Archive.h"
+#include "MFC-Point.h"
+#include "MFC-Rect.h"
+#include "MFC-DC.h"
+#include "MFC-Doc.h"
 
-#include "MFC/Kanban.h"
-#include "MFC/MainFrm.h"
-#include "MFC/ChildFrm.h"
-#include "MFC/KanbanDoc.h"
-#include "MFC/KanbanView.h"
+#include "Kanban.h"
+#include "MainFrm.h"
+#include "ChildFrm.h"
+#include "KanbanDoc.h"
+#include "KanbanView.h"
 
 #include <propkey.h>
 
-
-#endif //PCH_H

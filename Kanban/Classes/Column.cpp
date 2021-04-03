@@ -12,11 +12,14 @@ namespace Kanban {
 
   Column::Column(Archive& ar)
   {
-    for (const auto& card : cards_) card->Serialize(ar);
+    size_t z;
+    ar >> title_ >> width_ >> z;
+    for (size_t i = 0U; i < z; ++i) cards_.emplace_back(std::make_unique<Card>(ar));
   }
 
   void Column::Serialize(Archive& ar) const
   {
+    ar << title_ << width_ << cards_.size();
     for (const auto& card : cards_) card->Serialize(ar);
   }
 

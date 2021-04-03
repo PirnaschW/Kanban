@@ -9,9 +9,9 @@ protected: // create from serialization only
 	CKanbanDoc() noexcept;
 	DECLARE_DYNCREATE(CKanbanDoc)
 
-// Attributes
+  // Attributes
 public:
-	std::unique_ptr<Kanban::Board> board_{nullptr};
+	MFC::Doc* doc_{nullptr};
 
 // Operations
 public:
@@ -27,7 +27,7 @@ public:
 
 // Implementation
 public:
-	virtual ~CKanbanDoc();
+  virtual inline ~CKanbanDoc();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;

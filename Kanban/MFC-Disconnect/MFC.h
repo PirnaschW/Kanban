@@ -9,4 +9,5 @@
 #include "MFC-Bitmap.h"
 #include "MFC-CmdUI.h"
 #include "MFC-Message.h"
+#include "MFC-Doc.h"
 #include "MFC-Constants.h"

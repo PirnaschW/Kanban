@@ -53,7 +53,7 @@ void CKanbanView::OnDraw(CDC* pDC)
 
 	// TODO: add draw code for native data here
   MFC::DC dc(pDC);
-  pDoc->board_->Draw(dc);
+  pDoc->doc_->Draw(dc);
 }
 
 

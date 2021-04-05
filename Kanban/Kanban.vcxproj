@@ -241,6 +241,20 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Classes.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="DlgCard.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="MFC-Disconnect\MFC-Archive.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeaderFile>
@@ -445,6 +459,7 @@
     <ClInclude Include="Classes\Classes.h" />
     <ClInclude Include="Classes\Column.h" />
     <ClInclude Include="Classes\UIContext.h" />
+    <ClInclude Include="DlgCard.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MFC-Disconnect\MFC-Archive.h" />
@@ -463,6 +478,7 @@
     <ClInclude Include="MFC\KanbanDoc.h" />
     <ClInclude Include="MFC\KanbanView.h" />
     <ClInclude Include="MFC\pch.h" />
+    <ClInclude Include="MFC\resource.h" />
     <ClInclude Include="MFC\targetver.h" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>

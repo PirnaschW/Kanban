@@ -15,8 +15,8 @@ namespace Kanban
   class UIContext
   {
   public:
-    const DC& dc;
-    Point p{};
+    const MFC::DC& dc;
+    MFC::Point p{};
   };
 
 }

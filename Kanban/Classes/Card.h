@@ -7,8 +7,8 @@ namespace Kanban
   public:
     Card(std::string title = "new Card", size_t height = UIDim::default_cardheight);
 
-    Card(Archive& ar);
-    void Serialize(Archive& ar) const;
+    Card(MFC::Archive& ar);
+    void Serialize(MFC::Archive& ar) const;
     void Draw(UIContext UIC, size_t width) const;
     size_t GetHeight(void) const noexcept;
 

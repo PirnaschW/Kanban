@@ -13,18 +13,17 @@
 #include "afxwinappex.h"
 #include "afxdialogex.h"
 
-//#include "MFC-Disconnect/MFC.h"
-#include "MFC-Archive.h"
-#include "MFC-Point.h"
-#include "MFC-Rect.h"
-#include "MFC-DC.h"
-#include "MFC-Doc.h"
+#include "MFC.h"
 
 #include "Kanban.h"
 #include "MainFrm.h"
 #include "ChildFrm.h"
 #include "KanbanDoc.h"
 #include "KanbanView.h"
+
+#include "UIContext.h"
+#include "Card.h"
+#include "DlgCard.h"
 
 #include <propkey.h>
 

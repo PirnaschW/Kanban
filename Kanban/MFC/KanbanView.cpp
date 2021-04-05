@@ -19,7 +19,12 @@ BEGIN_MESSAGE_MAP(CKanbanView, CView)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CKanbanView::OnFilePrintPreview)
 	ON_WM_CONTEXTMENU()
-	ON_WM_RBUTTONUP()
+  ON_WM_LBUTTONDOWN()
+  ON_WM_LBUTTONUP()
+  ON_WM_LBUTTONDBLCLK()
+  ON_WM_RBUTTONUP()
+  ON_WM_MOUSEMOVE()
+  ON_WM_CHAR()
 END_MESSAGE_MAP()
 
 // CKanbanView construction/destruction
@@ -83,20 +88,6 @@ void CKanbanView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 	// TODO: add cleanup after printing
 }
 
-void CKanbanView::OnRButtonUp(UINT /* nFlags */, CPoint point)
-{
-	ClientToScreen(&point);
-	OnContextMenu(this, point);
-}
-
-void CKanbanView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
-{
-#ifndef SHARED_HANDLERS
-	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
-#endif
-}
-
-
 // CKanbanView diagnostics
 
 #ifdef _DEBUG
@@ -119,3 +110,44 @@ CKanbanDoc* CKanbanView::GetDocument() const // non-debug version is inline
 
 
 // CKanbanView message handlers
+void CKanbanView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
+{
+#ifndef SHARED_HANDLERS
+  theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
+#endif
+}
+
+void CKanbanView::OnLButtonDown(UINT nFlags, CPoint point)
+{
+  if (GetDocument()->doc_->React(WM_LBUTTONDOWN, nFlags, MFC::Point(point.x, point.y))) GetDocument()->UpdateAllViews(nullptr);
+}
+
+void CKanbanView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+  if (GetDocument()->doc_->React(WM_LBUTTONUP, nFlags, MFC::Point(point.x, point.y))) GetDocument()->UpdateAllViews(nullptr);
+}
+
+void CKanbanView::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+  if (GetDocument()->doc_->React(WM_LBUTTONDBLCLK, nFlags, MFC::Point(point.x, point.y))) GetDocument()->UpdateAllViews(nullptr);
+}
+
+void CKanbanView::OnRButtonUp(UINT nFlags, CPoint point)
+{
+  if (GetDocument()->doc_->React(WM_RBUTTONUP, nFlags, MFC::Point(point.x, point.y))) GetDocument()->UpdateAllViews(nullptr);
+  else
+  {
+    ClientToScreen(&point);
+    OnContextMenu(this, point);
+  }
+}
+
+void CKanbanView::OnMouseMove(UINT nFlags, CPoint point)
+{
+  if (GetDocument()->doc_->React(WM_MOUSEMOVE, nFlags, MFC::Point(point.x, point.y))) GetDocument()->UpdateAllViews(nullptr);
+}
+
+void CKanbanView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+  if (GetDocument()->doc_->React(nChar, nRepCnt, nFlags)) GetDocument()->UpdateAllViews(nullptr);
+}

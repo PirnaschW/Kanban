@@ -1,10 +1,4 @@
 
-// KanbanView.h : interface of the CKanbanView class
-//
-
-#pragma once
-
-
 class CKanbanView : public CView
 {
 protected: // create from serialization only
@@ -39,7 +33,8 @@ protected:
 
 // Generated message map functions
 protected:
-	afx_msg void OnFilePrintPreview();
+  //{{AFX_MSG(CKanbanView)
+  afx_msg void OnFilePrintPreview();
   afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
   afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
   afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
@@ -47,11 +42,11 @@ protected:
   afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
   afx_msg void OnMouseMove(UINT nFlags, CPoint point);
   afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
-	DECLARE_MESSAGE_MAP()
+  //}}AFX_MSG
+  DECLARE_MESSAGE_MAP()
 };
 
 #ifndef _DEBUG  // debug version in KanbanView.cpp
 inline CKanbanDoc* CKanbanView::GetDocument() const
    { return reinterpret_cast<CKanbanDoc*>(m_pDocument); }
 #endif
-

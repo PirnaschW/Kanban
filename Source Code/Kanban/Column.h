@@ -7,9 +7,9 @@ namespace Kanban
   public:
     Column(std::string title = "new Column", size_t width = 190U);
 
-    Column(Archive& ar);
-    void Serialize(Archive& ar) const;
-    void Draw(UIContext UIC) const;
+    Column(CArchive* ar);
+    void Serialize(CArchive* ar) const;
+    void Draw(CDC* pDC, CPoint& p) const;
     size_t GetWidth() const noexcept { return width_; }
 
   private:

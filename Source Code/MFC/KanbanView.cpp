@@ -1,28 +1,21 @@
 
-// KanbanView.cpp : implementation of the CKanbanView class
-//
-
 #include "pch.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-
-// CKanbanView
-
 IMPLEMENT_DYNCREATE(CKanbanView, CView)
 
 BEGIN_MESSAGE_MAP(CKanbanView, CView)
-	// Standard printing commands
-	ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CKanbanView::OnFilePrintPreview)
-	ON_WM_CONTEXTMENU()
+  // Standard printing commands
+  ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
+  ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
+  ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CKanbanView::OnFilePrintPreview)
+  ON_WM_CONTEXTMENU()
   ON_WM_LBUTTONDOWN()
   ON_WM_LBUTTONUP()
   ON_WM_LBUTTONDBLCLK()
-  ON_WM_RBUTTONUP()
   ON_WM_MOUSEMOVE()
   ON_WM_CHAR()
 END_MESSAGE_MAP()
@@ -57,8 +50,7 @@ void CKanbanView::OnDraw(CDC* pDC)
 		return;
 
 	// TODO: add draw code for native data here
-  MFC::DC dc(pDC);
-  pDoc->doc_->Draw(dc);
+  pDoc->board_->Draw(pDC);
 }
 
 
@@ -119,35 +111,36 @@ void CKanbanView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 
 void CKanbanView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-  if (GetDocument()->doc_->React(WM_LBUTTONDOWN, nFlags, MFC::Point(point.x, point.y))) GetDocument()->UpdateAllViews(nullptr);
+  //if (GetDocument()->board_->React(WM_LBUTTONDOWN, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
 }
 
 void CKanbanView::OnLButtonUp(UINT nFlags, CPoint point)
 {
-  if (GetDocument()->doc_->React(WM_LBUTTONUP, nFlags, MFC::Point(point.x, point.y))) GetDocument()->UpdateAllViews(nullptr);
+  //if (GetDocument()->board_->React(WM_LBUTTONUP, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
 }
 
-void CKanbanView::OnLButtonDblClk(UINT nFlags, CPoint point)
+void CKanbanView::OnLButtonDblClk(UINT nFlags, CPoint p)
 {
-  if (GetDocument()->doc_->React(WM_LBUTTONDBLCLK, nFlags, MFC::Point(point.x, point.y))) GetDocument()->UpdateAllViews(nullptr);
+  if (GetDocument()->board_->React(WM_LBUTTONDBLCLK, nFlags, p)) GetDocument()->UpdateAllViews(nullptr);
 }
 
 void CKanbanView::OnRButtonUp(UINT nFlags, CPoint point)
 {
-  if (GetDocument()->doc_->React(WM_RBUTTONUP, nFlags, MFC::Point(point.x, point.y))) GetDocument()->UpdateAllViews(nullptr);
-  else
-  {
-    ClientToScreen(&point);
-    OnContextMenu(this, point);
-  }
+  if (GetDocument()->board_->React(WM_LBUTTONDBLCLK, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
+  //if (GetDocument()->board_->React(WM_RBUTTONUP, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
+  //else
+  //{
+  //  ClientToScreen(&point);
+  //  OnContextMenu(this, point);
+  //}
 }
 
 void CKanbanView::OnMouseMove(UINT nFlags, CPoint point)
 {
-  if (GetDocument()->doc_->React(WM_MOUSEMOVE, nFlags, MFC::Point(point.x, point.y))) GetDocument()->UpdateAllViews(nullptr);
+  //if (GetDocument()->board_->React(WM_MOUSEMOVE, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
 }
 
 void CKanbanView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-  if (GetDocument()->doc_->React(nChar, nRepCnt, nFlags)) GetDocument()->UpdateAllViews(nullptr);
+  //if (GetDocument()->board_->React(nChar, nRepCnt, nFlags)) GetDocument()->UpdateAllViews(nullptr);
 }

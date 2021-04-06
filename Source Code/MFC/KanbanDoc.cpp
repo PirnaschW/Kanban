@@ -20,13 +20,13 @@ END_MESSAGE_MAP()
 
 CKanbanDoc::CKanbanDoc() noexcept {}
 
-CKanbanDoc::~CKanbanDoc() { delete doc_; }
+CKanbanDoc::~CKanbanDoc() { delete board_; }
 
 BOOL CKanbanDoc::OnNewDocument()
 {
 	if (!CDocument::OnNewDocument()) return FALSE;
 
-	doc_ = new MFC::Doc(++theApp.next_);
+	board_ = new Kanban::Board(++theApp.next_);
 	return TRUE;
 }
 
@@ -35,9 +35,8 @@ BOOL CKanbanDoc::OnNewDocument()
 
 void CKanbanDoc::Serialize(CArchive& ar)
 {
-  MFC::Archive AR(&ar);
-	if (ar.IsStoring()) doc_->Serialize(AR);
-	else doc_ = new MFC::Doc(AR);
+	if (ar.IsStoring()) board_->Serialize(&ar);
+	else board_ = new Kanban::Board(&ar);
 }
 
 #ifdef SHARED_HANDLERS

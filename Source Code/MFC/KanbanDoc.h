@@ -11,7 +11,7 @@ protected: // create from serialization only
 
   // Attributes
 public:
-	MFC::Doc* doc_{nullptr};
+	Kanban::Board* board_{nullptr};
 
 // Operations
 public:

@@ -1,4 +1,4 @@
-#include "Classes.h"
+#include "pch.h"
 
 namespace Kanban {
 
@@ -10,25 +10,25 @@ namespace Kanban {
   }
 
 
-  Column::Column(Archive& ar)
+  Column::Column(CArchive* ar)
   {
     size_t z;
-    ar >> title_ >> width_ >> z;
+    *ar >> title_ >> width_ >> z;
     for (size_t i = 0U; i < z; ++i) cards_.emplace_back(std::make_unique<Card>(ar));
   }
 
-  void Column::Serialize(Archive& ar) const
+  void Column::Serialize(CArchive* ar) const
   {
-    ar << title_ << width_ << cards_.size();
+    *ar << title_ << width_ << cards_.size();
     for (const auto& card : cards_) card->Serialize(ar);
   }
 
-  void Column::Draw(UIContext UIC) const
+  void Column::Draw(CDC* pDC, CPoint& p) const
   {
     for (const auto& card : cards_)
     {
-      card->Draw(UIC, GetWidth());
-      UIC.p.y_ += card->GetHeight() + UIDim::verticalspace;
+      card->Draw(pDC, p, GetWidth());
+      p.y += card->GetHeight() + UIDim::verticalspace;
     }
 
   }

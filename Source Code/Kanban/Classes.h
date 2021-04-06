@@ -1,8 +1,4 @@
 
-#include <ctime>
-#include <memory>
-#include <string>
-#include <vector>
 
 #include "MFC.h"
 using namespace MFC;

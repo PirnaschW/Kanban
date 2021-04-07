@@ -6,30 +6,30 @@
 
 class CChildFrame : public CMDIChildWndEx
 {
-	DECLARE_DYNCREATE(CChildFrame)
+  DECLARE_DYNCREATE(CChildFrame)
 public:
-	CChildFrame() noexcept;
+  CChildFrame() noexcept;
 
 // Attributes
 protected:
-	CSplitterWnd m_wndSplitter;
+  CSplitterWnd m_wndSplitter;
 public:
 
 // Operations
 public:
 
 // Overrides
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+  virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 
 // Implementation
 public:
-	virtual ~CChildFrame();
+  virtual ~CChildFrame();
 #ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
+  virtual void AssertValid() const;
+  virtual void Dump(CDumpContext& dc) const;
 #endif
 
 // Generated message map functions
 protected:
-	DECLARE_MESSAGE_MAP()
+  DECLARE_MESSAGE_MAP()
 };

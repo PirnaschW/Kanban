@@ -5,9 +5,9 @@ namespace Kanban
   class Board
   {
   public:
-    Board(size_t n);
-    Board(std::string title = "new Board");
-    ~Board(void);
+    Board(size_t n) noexcept;
+    Board(std::string title = "new Board") noexcept;
+    ~Board(void) noexcept;
 
     Board(CArchive* ar);
     void Serialize(CArchive* ar) const;
@@ -21,15 +21,19 @@ namespace Kanban
     //void DragEnd(const CPoint& p);
 
     Card* GetCard(const CPoint& p) const;
+    Column* GetColumn(const CPoint& p) const;
+    void AddColumn(Column* c);
+    void RemoveColumn(Column* c);
 
   private:
     std::string title_{};
 
-    std::vector<std::unique_ptr<Column>> columns_{};
+    std::list<Column*> columns_{};
     std::vector<std::string> owners_{};
     // filter_
     double scale_{ 1.0 };
 
+    Card* selected_{ nullptr };
     const void* dragObject_{};         // currently dragged object
     CPoint dragPoint_{};           // point the object is dragged to
 

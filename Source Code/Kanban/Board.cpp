@@ -2,59 +2,62 @@
 
 namespace Kanban
 {
-  Board::Board(size_t n) : title_("Kanban Board " + std::to_string(n))
+  Board::Board(size_t n) noexcept : title_("Kanban Board " + std::to_string(n))
   {
-    columns_.emplace_back(std::make_unique<Column>("Col 1"));
-    columns_.emplace_back(std::make_unique<Column>("Col 2", 300U));
-    columns_.emplace_back(std::make_unique<Column>("Col 3"));
+    for (size_t z = 0; z < 100; ++z) AddColumn(new Column("Col " + z, 120U + rand() % 120));
   }
-	
-	Board::Board(std::string title) : title_(title) {}
-	
-	Board::~Board(void)
-	{
+ 
+  Board::Board(std::string title) noexcept : title_(title) {}
+  
+  Board::~Board(void) noexcept { for (auto& c : columns_) delete c;  }
 
-	}
-
-	Board::Board(CArchive* ar)
-	{
+  Board::Board(CArchive* ar)
+  {
     size_t z;
     *ar >> title_ >> z;
-    for (size_t i = 0U; i < z; ++i) columns_.emplace_back(std::make_unique<Column>(ar));
-	}
+    for (size_t i = 0U; i < z; ++i) AddColumn(new Column(ar));
+  }
 
-	void Board::Serialize(CArchive* ar) const
-	{
+  void Board::Serialize(CArchive* ar) const
+  {
     *ar << title_ << columns_.size();
     for (const auto& column : columns_) column->Serialize(ar);
   }
 
-	void Board::Draw(CDC* pDC) const
-	{
+  void Board::Draw(CDC* pDC) const
+  {
+    VERIFY(pDC);
     CPoint p{UIDim::horizontalspace,UIDim::verticalspace};
-		for (const auto& column : columns_)
-		{
+    for (const auto& column : columns_)
+    {
       p.y = UIDim::verticalspace; // reset for each column
+      VERIFY(column);
       column->Draw(pDC, p);
-			p.x += column->GetWidth() + UIDim::horizontalspace;
-		}
-	}
+      p.x += column->GetWidth() + UIDim::horizontalspace;
+    }
+  }
 
   bool Board::React(unsigned int event, unsigned int nFlags, const CPoint& p)   // react to mouse events
   { 
+    Card* c{ nullptr };
     switch (event)
     {
       case WM_LBUTTONDOWN:
-//        if (_mode.IsSet(Mode::Editing)) DragStart(p);
+        c = GetCard(p);
+        if (!c) return false;
+        if (selected_) selected_->Select(false);
+        c->Select(true);
+        selected_ = c;
+        //        if (_mode.IsSet(Mode::Editing)) DragStart(p);
         break;
       case WM_LBUTTONUP:
         //if (_mode.IsSet(Mode::Dragging)) DragEnd(p);
         //else Select(p);
         break;
       case WM_LBUTTONDBLCLK:
+        c = GetCard(p);
+        if (!c) return false;
         {
-          Card* c = GetCard(p);
-          if (!c) return false;
           DlgCard dlg(*c);
           dlg.DoModal();
         }
@@ -74,7 +77,28 @@ namespace Kanban
   }
 
 
-  Card* Board::GetCard(const CPoint& p) const { return nullptr; }
+  Card* Board::GetCard(const CPoint& p) const
+  {
+    const Column* col = GetColumn(p);
+    return col ? col->GetCard(p) : nullptr;
+  }
+
+  Column* Board::GetColumn(const CPoint& p) const
+  {
+    for (auto& c : columns_) if (c->PtInColumn(p)) return c;
+    return nullptr;
+  }
+
+
+  void Board::AddColumn(Column* c)
+  {
+    columns_.push_back(c);
+  }
+
+  void Board::RemoveColumn(Column* c)
+  {
+    columns_.remove(c);
+  }
 
 }
 

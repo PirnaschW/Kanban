@@ -8,7 +8,7 @@
 IMPLEMENT_DYNAMIC(DlgCard, CDialogEx)
 
 DlgCard::DlgCard(Kanban::Card& c, CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_DLGCARD, pParent)
+  : CDialogEx(IDD_DLGCARD, pParent)
 {
 
 }
@@ -19,7 +19,7 @@ DlgCard::~DlgCard()
 
 void DlgCard::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
+  CDialogEx::DoDataExchange(pDX);
 }
 
 

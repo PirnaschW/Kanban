@@ -11,25 +11,25 @@
 class CKanbanApp : public CWinAppEx
 {
 public:
-	CKanbanApp() noexcept;
+  CKanbanApp() noexcept;
 
 public:
-	size_t next_{ 0 };
+  size_t next_{ 0 };
 
 // Overrides
 public:
-	virtual BOOL InitInstance();
-	virtual int ExitInstance();
+  virtual BOOL InitInstance();
+  virtual int ExitInstance();
 
 // Implementation
-	BOOL  m_bHiColorIcons;
+  BOOL  m_bHiColorIcons;
 
-	virtual void PreLoadState();
-	virtual void LoadCustomState();
-	virtual void SaveCustomState();
+  virtual void PreLoadState();
+  virtual void LoadCustomState();
+  virtual void SaveCustomState();
 
-	afx_msg void OnAppAbout();
-	DECLARE_MESSAGE_MAP()
+  afx_msg void OnAppAbout();
+  DECLARE_MESSAGE_MAP()
 };
 
 extern CKanbanApp theApp;

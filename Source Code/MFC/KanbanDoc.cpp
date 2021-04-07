@@ -24,10 +24,12 @@ CKanbanDoc::~CKanbanDoc() { delete board_; }
 
 BOOL CKanbanDoc::OnNewDocument()
 {
-	if (!CDocument::OnNewDocument()) return FALSE;
+  if (!CDocument::OnNewDocument()) return FALSE;
 
-	board_ = new Kanban::Board(++theApp.next_);
-	return TRUE;
+  VERIFY(board_ == nullptr);
+  board_ = new Kanban::Board(++theApp.next_);
+  VERIFY(board_);
+  return TRUE;
 }
 
 
@@ -35,8 +37,8 @@ BOOL CKanbanDoc::OnNewDocument()
 
 void CKanbanDoc::Serialize(CArchive& ar)
 {
-	if (ar.IsStoring()) board_->Serialize(&ar);
-	else board_ = new Kanban::Board(&ar);
+  if (ar.IsStoring()) board_->Serialize(&ar);
+  else board_ = new Kanban::Board(&ar);
 }
 
 #ifdef SHARED_HANDLERS
@@ -44,51 +46,51 @@ void CKanbanDoc::Serialize(CArchive& ar)
 // Support for thumbnails
 void CKanbanDoc::OnDrawThumbnail(CDC& dc, LPRECT lprcBounds)
 {
-	// Modify this code to draw the document's data
-	dc.FillSolidRect(lprcBounds, RGB(255, 255, 255));
+  // Modify this code to draw the document's data
+  dc.FillSolidRect(lprcBounds, RGB(255, 255, 255));
 
-	CString strText = _T("TODO: implement thumbnail drawing here");
-	LOGFONT lf;
+  CString strText = _T("TODO: implement thumbnail drawing here");
+  LOGFONT lf;
 
-	CFont* pDefaultGUIFont = CFont::FromHandle((HFONT) GetStockObject(DEFAULT_GUI_FONT));
-	pDefaultGUIFont->GetLogFont(&lf);
-	lf.lfHeight = 36;
+  CFont* pDefaultGUIFont = CFont::FromHandle((HFONT) GetStockObject(DEFAULT_GUI_FONT));
+  pDefaultGUIFont->GetLogFont(&lf);
+  lf.lfHeight = 36;
 
-	CFont fontDraw;
-	fontDraw.CreateFontIndirect(&lf);
+  CFont fontDraw;
+  fontDraw.CreateFontIndirect(&lf);
 
-	CFont* pOldFont = dc.SelectObject(&fontDraw);
-	dc.DrawText(strText, lprcBounds, DT_CENTER | DT_WORDBREAK);
-	dc.SelectObject(pOldFont);
+  CFont* pOldFont = dc.SelectObject(&fontDraw);
+  dc.DrawText(strText, lprcBounds, DT_CENTER | DT_WORDBREAK);
+  dc.SelectObject(pOldFont);
 }
 
 // Support for Search Handlers
 void CKanbanDoc::InitializeSearchContent()
 {
-	CString strSearchContent;
-	// Set search contents from document's data.
-	// The content parts should be separated by ";"
+  CString strSearchContent;
+  // Set search contents from document's data.
+  // The content parts should be separated by ";"
 
-	// For example:  strSearchContent = _T("point;rectangle;circle;ole object;");
-	SetSearchContent(strSearchContent);
+  // For example:  strSearchContent = _T("point;rectangle;circle;ole object;");
+  SetSearchContent(strSearchContent);
 }
 
 void CKanbanDoc::SetSearchContent(const CString& value)
 {
-	if (value.IsEmpty())
-	{
-		RemoveChunk(PKEY_Search_Contents.fmtid, PKEY_Search_Contents.pid);
-	}
-	else
-	{
-		CMFCFilterChunkValueImpl *pChunk = nullptr;
-		ATLTRY(pChunk = new CMFCFilterChunkValueImpl);
-		if (pChunk != nullptr)
-		{
-			pChunk->SetTextValue(PKEY_Search_Contents, value, CHUNK_TEXT);
-			SetChunkValue(pChunk);
-		}
-	}
+  if (value.IsEmpty())
+  {
+    RemoveChunk(PKEY_Search_Contents.fmtid, PKEY_Search_Contents.pid);
+  }
+  else
+  {
+    CMFCFilterChunkValueImpl *pChunk = nullptr;
+    ATLTRY(pChunk = new CMFCFilterChunkValueImpl);
+    if (pChunk != nullptr)
+    {
+      pChunk->SetTextValue(PKEY_Search_Contents, value, CHUNK_TEXT);
+      SetChunkValue(pChunk);
+    }
+  }
 }
 
 #endif // SHARED_HANDLERS
@@ -98,12 +100,12 @@ void CKanbanDoc::SetSearchContent(const CString& value)
 #ifdef _DEBUG
 void CKanbanDoc::AssertValid() const
 {
-	CDocument::AssertValid();
+  CDocument::AssertValid();
 }
 
 void CKanbanDoc::Dump(CDumpContext& dc) const
 {
-	CDocument::Dump(dc);
+  CDocument::Dump(dc);
 }
 #endif //_DEBUG
 

@@ -2,31 +2,31 @@
 class CKanbanView : public CView
 {
 protected: // create from serialization only
-	CKanbanView() noexcept;
-	DECLARE_DYNCREATE(CKanbanView)
+  CKanbanView() noexcept;
+  DECLARE_DYNCREATE(CKanbanView)
 
 // Attributes
 public:
-	CKanbanDoc* GetDocument() const;
+  CKanbanDoc* GetDocument() const;
 
 // Operations
 public:
 
 // Overrides
 public:
-	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+  virtual void OnDraw(CDC* pDC);  // overridden to draw this view
+  virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 protected:
-	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
-	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
-	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
+  virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
+  virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
+  virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
 
 // Implementation
 public:
-	virtual ~CKanbanView();
+  virtual ~CKanbanView();
 #ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
+  virtual void AssertValid() const;
+  virtual void Dump(CDumpContext& dc) const;
 #endif
 
 protected:

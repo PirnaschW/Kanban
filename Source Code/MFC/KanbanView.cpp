@@ -24,7 +24,7 @@ END_MESSAGE_MAP()
 
 CKanbanView::CKanbanView() noexcept
 {
-	// TODO: add construction code here
+  // TODO: add construction code here
 
 }
 
@@ -34,23 +34,26 @@ CKanbanView::~CKanbanView()
 
 BOOL CKanbanView::PreCreateWindow(CREATESTRUCT& cs)
 {
-	// TODO: Modify the Window class or styles here by modifying
-	//  the CREATESTRUCT cs
+  // TODO: Modify the Window class or styles here by modifying
+  //  the CREATESTRUCT cs
 
-	return CView::PreCreateWindow(cs);
+  return CView::PreCreateWindow(cs);
 }
 
 // CKanbanView drawing
 
 void CKanbanView::OnDraw(CDC* pDC)
 {
-	CKanbanDoc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);
-	if (!pDoc)
-		return;
+  CKanbanDoc* pDoc = GetDocument();
+  ASSERT_VALID(pDoc);
+  if (!pDoc)
+    return;
 
-	// TODO: add draw code for native data here
-  pDoc->board_->Draw(pDC);
+  // TODO: add draw code for native data here
+  VERIFY(pDoc->board_);
+  if (pDoc->board_ == nullptr)
+    theApp.next_++;
+  else pDoc->board_->Draw(pDC);
 }
 
 
@@ -60,24 +63,24 @@ void CKanbanView::OnDraw(CDC* pDC)
 void CKanbanView::OnFilePrintPreview()
 {
 #ifndef SHARED_HANDLERS
-	AFXPrintPreview(this);
+  AFXPrintPreview(this);
 #endif
 }
 
 BOOL CKanbanView::OnPreparePrinting(CPrintInfo* pInfo)
 {
-	// default preparation
-	return DoPreparePrinting(pInfo);
+  // default preparation
+  return DoPreparePrinting(pInfo);
 }
 
 void CKanbanView::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 {
-	// TODO: add extra initialization before printing
+  // TODO: add extra initialization before printing
 }
 
 void CKanbanView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 {
-	// TODO: add cleanup after printing
+  // TODO: add cleanup after printing
 }
 
 // CKanbanView diagnostics
@@ -85,18 +88,18 @@ void CKanbanView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 #ifdef _DEBUG
 void CKanbanView::AssertValid() const
 {
-	CView::AssertValid();
+  CView::AssertValid();
 }
 
 void CKanbanView::Dump(CDumpContext& dc) const
 {
-	CView::Dump(dc);
+  CView::Dump(dc);
 }
 
 CKanbanDoc* CKanbanView::GetDocument() const // non-debug version is inline
 {
-	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CKanbanDoc)));
-	return (CKanbanDoc*)m_pDocument;
+  ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CKanbanDoc)));
+  return (CKanbanDoc*)m_pDocument;
 }
 #endif //_DEBUG
 
@@ -111,12 +114,12 @@ void CKanbanView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 
 void CKanbanView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-  //if (GetDocument()->board_->React(WM_LBUTTONDOWN, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
+  if (GetDocument()->board_->React(WM_LBUTTONDOWN, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
 }
 
 void CKanbanView::OnLButtonUp(UINT nFlags, CPoint point)
 {
-  //if (GetDocument()->board_->React(WM_LBUTTONUP, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
+  if (GetDocument()->board_->React(WM_LBUTTONUP, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
 }
 
 void CKanbanView::OnLButtonDblClk(UINT nFlags, CPoint p)
@@ -137,10 +140,10 @@ void CKanbanView::OnRButtonUp(UINT nFlags, CPoint point)
 
 void CKanbanView::OnMouseMove(UINT nFlags, CPoint point)
 {
-  //if (GetDocument()->board_->React(WM_MOUSEMOVE, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
+  if (GetDocument()->board_->React(WM_MOUSEMOVE, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
 }
 
 void CKanbanView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-  //if (GetDocument()->board_->React(nChar, nRepCnt, nFlags)) GetDocument()->UpdateAllViews(nullptr);
+  if (GetDocument()->board_->React(nChar, nRepCnt, nFlags)) GetDocument()->UpdateAllViews(nullptr);
 }

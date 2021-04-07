@@ -1,18 +1,30 @@
 
 namespace Kanban
 {
+  class Column;
 
   class Card
   {
   public:
-    Card(std::string title = "new Card", size_t height = UIDim::default_cardheight);
+    Card(Column* col, std::string title = "new Card", size_t height = UIDim::default_cardheight) noexcept;
+    ~Card(void) noexcept;
 
-    Card(CArchive* ar);
-    void Serialize(CArchive* ar) const;
-    void Draw(CDC* pDC, CPoint& p, size_t width) const;
+    Card(CArchive* ar);                                  // create from file
+    void Serialize(CArchive* ar) const;                  // save to file
+    void Draw(CDC* pDC, CPoint& p, size_t width) const;  // display at point p
+ 
     size_t GetHeight(void) const noexcept;
+    Column* SetColumn(Column* col) noexcept;
+    bool PtInCard(const CPoint& p) const noexcept;
+    void Select(bool s) const noexcept;
 
   private:
+    // organizational info
+    mutable Column* col_;               // column the card is in
+    mutable bool selected_{ false };
+    mutable CRect rect_{};
+
+    // card data
     std::string title_{};
     std::string text_{};
     size_t height_{};

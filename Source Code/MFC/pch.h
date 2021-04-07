@@ -5,6 +5,7 @@
 // Do not add files here that you will be updating frequently as this negates the performance advantage.
 
 #include <ctime>
+#include <list>
 #include <memory>
 #include <string>
 #include <xstring>

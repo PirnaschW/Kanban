@@ -26,9 +26,7 @@ BOOL CKanbanDoc::OnNewDocument()
 {
   if (!CDocument::OnNewDocument()) return FALSE;
 
-  VERIFY(board_ == nullptr);
   board_ = new Kanban::Board(++theApp.next_);
-  VERIFY(board_);
   return TRUE;
 }
 

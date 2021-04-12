@@ -49,11 +49,7 @@ void CKanbanView::OnDraw(CDC* pDC)
   if (!pDoc)
     return;
 
-  // TODO: add draw code for native data here
-  VERIFY(pDoc->board_);
-  if (pDoc->board_ == nullptr)
-    theApp.next_++;
-  else pDoc->board_->Draw(pDC);
+  pDoc->board_->Draw(pDC);
 }
 
 
@@ -129,17 +125,17 @@ void CKanbanView::OnLButtonDblClk(UINT nFlags, CPoint p)
 
 void CKanbanView::OnRButtonUp(UINT nFlags, CPoint point)
 {
-  if (GetDocument()->board_->React(WM_LBUTTONDBLCLK, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
-  //if (GetDocument()->board_->React(WM_RBUTTONUP, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
-  //else
-  //{
-  //  ClientToScreen(&point);
-  //  OnContextMenu(this, point);
-  //}
+  if (GetDocument()->board_->React(WM_RBUTTONUP, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
+  else
+  {
+    ClientToScreen(&point);
+    OnContextMenu(this, point);
+  }
 }
 
 void CKanbanView::OnMouseMove(UINT nFlags, CPoint point)
 {
+  GetDocument()->board_->SetHWND(GetSafeHwnd());
   if (GetDocument()->board_->React(WM_MOUSEMOVE, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
 }
 

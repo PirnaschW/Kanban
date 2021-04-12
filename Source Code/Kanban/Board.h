@@ -6,11 +6,11 @@ namespace Kanban
   {
   public:
     Board(size_t n) noexcept;
-    Board(std::string title = "new Board") noexcept;
-    ~Board(void) noexcept;
-
     Board(CArchive* ar);
     void Serialize(CArchive* ar) const;
+    ~Board(void) noexcept;
+
+    void SetHWND(HWND hView) const noexcept;
     void Draw(CDC* pDC) const;
     //bool React(unsigned int nChar, unsigned int nRepCnt, unsigned int nFlags);      // react to keyboard input (not menu shortcuts, but typing)
     //bool React(unsigned int command);                                               // react to button/menu command
@@ -22,21 +22,18 @@ namespace Kanban
 
     Card* GetCard(const CPoint& p) const;
     Column* GetColumn(const CPoint& p) const;
-    void AddColumn(Column* c);
-    void RemoveColumn(Column* c);
+    //void RemoveColumn(Column* c);
 
   private:
-    std::string title_{};
+    // situational & display data
+    mutable Card* selected_{ nullptr };   // currently selected / dragged Card
+    mutable bool dragging_{ false };       // currently dragging a card
+    mutable CPoint dragPoint_{};           // point the Card is dragged to
+    mutable HWND hView_{};
 
-    std::list<Column*> columns_{};
-    std::vector<std::string> owners_{};
-    // filter_
-    double scale_{ 1.0 };
-
-    Card* selected_{ nullptr };
-    const void* dragObject_{};         // currently dragged object
-    CPoint dragPoint_{};           // point the object is dragged to
-
+    // object data
+    std::wstring title_{};
+    std::vector<Column*> column_{};      // all Columns
   };
 
 }

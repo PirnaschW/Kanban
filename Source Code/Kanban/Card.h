@@ -1,35 +1,32 @@
 
 namespace Kanban
 {
-  class Column;
 
-  class Card
+  class Card  // a Card
   {
   public:
-    Card(Column* col, std::string title = "new Card", size_t height = UIDim::default_cardheight) noexcept;
+    Card(std::wstring title = L"") noexcept;           // create a new Card
+    Card(CArchive* ar);                                // create from file
+    void Serialize(CArchive* ar) const;                // save to file
     ~Card(void) noexcept;
+    operator ID(void) const noexcept { return ID_; }   // cast to ID
 
-    Card(CArchive* ar);                                  // create from file
-    void Serialize(CArchive* ar) const;                  // save to file
-    void Draw(CDC* pDC, CPoint& p, size_t width) const;  // display at point p
- 
-    size_t GetHeight(void) const noexcept;
-    Column* SetColumn(Column* col) noexcept;
-    bool PtInCard(const CPoint& p) const noexcept;
-    void Select(bool s) const noexcept;
+    void SetText(std::wstring t) noexcept;
+    void Draw(CDC* pDC, const CPoint& p, UIStatus s, size_t width = 0U) const;   // display card
+    size_t GetWidth(void) const noexcept;              // width of this card
+    size_t GetHeight(void) const noexcept;             // height this card needs / wants
+    bool PtInCard(const CPoint& p) const noexcept;     // check if a point is inside this card
 
   private:
-    // organizational info
-    mutable Column* col_;               // column the card is in
-    mutable bool selected_{ false };
-    mutable CRect rect_{};
+    CRect GetRectTitle(CDC* pDC) const noexcept;
 
-    // card data
-    std::string title_{};
-    std::string text_{};
-    size_t height_{};
-    size_t size_{ 0 };
-    std::string owner_{};
+  private:
+    ID ID_{};
+    static inline ID lastID_{ 0U };
+    std::wstring title_{};
+    std::wstring text_{};
+    size_t storysize_{ 0 };
+    std::wstring owner_{};
     size_t priority_{ 0 };
     time_t planned_start_{ 0LL };
     time_t planned_end_{ 0LL };
@@ -37,6 +34,13 @@ namespace Kanban
     time_t actual_end_{ 0LL };
     size_t type_{ 0 };
     size_t color_{ 0 };
+
+    mutable bool bValid_{ false };       // buffered data is valid
+    mutable CRect rTitle_{ 0,0,0,0 };    // buffered title height
+    mutable size_t hTitle_{ 0U };        // buffered title height
+    mutable CRect rText_{ 0,0,0,0 };     // buffered title height
+    mutable size_t hText_{ 0U };         // buffered text height
+    mutable CRect rCard_{ 0,0,0,0 };     // buffered total Card rectangle
   };
 
 }

@@ -2,155 +2,117 @@
 
 namespace Kanban
 {
-  Board::Board(size_t n) noexcept : title_("Kanban Board " + std::to_string(n))
+  Board::Board(size_t n) noexcept : title_(L"Kanban Board " + std::to_wstring(n))
   {
-    for (size_t z = 0; z < 100; ++z) AddColumn(new Column("Col " + z, 120U + rand() % 120));
+    column_.reserve(UIDim::dummycolumns);
+    for (size_t z = 0; z < UIDim::dummycolumns; ++z)
+      column_.push_back(new Column(L"", 120U + rand() % 120));
   }
- 
-  Board::Board(std::string title) noexcept : title_(title) {}
-  
-  Board::~Board(void) noexcept { for (auto& c : columns_) delete c;  }
-
   Board::Board(CArchive* ar)
   {
     size_t z;
     *ar >> title_ >> z;
-    for (size_t i = 0U; i < z; ++i) AddColumn(new Column(ar));
-  }
+    column_.reserve(z);
 
+    for (size_t i = 0U; i < z; ++i) column_.push_back(new Column(ar));   // read complete column from archive
+  }
   void Board::Serialize(CArchive* ar) const
   {
-    *ar << title_ << columns_.size();
-    for (const auto& column : columns_) column->Serialize(ar);
+    *ar << title_ << column_.size();
+    for (const auto* c : column_) c->Serialize(ar);
   }
-
-  void Board::Draw(CDC* pDC) const
+  Board::~Board(void) noexcept
   {
-    VERIFY(pDC);
-    CPoint p{UIDim::horizontalspace,UIDim::verticalspace};
-    for (const auto& column : columns_)
-    {
-      p.y = UIDim::verticalspace; // reset for each column
-      VERIFY(column);
-      column->Draw(pDC, p);
-      p.x += column->GetWidth() + UIDim::horizontalspace;
-    }
-  }
-
-  bool Board::React(unsigned int event, unsigned int nFlags, const CPoint& p)   // react to mouse events
-  { 
-    Card* c{ nullptr };
-    switch (event)
-    {
-      case WM_LBUTTONDOWN:
-        c = GetCard(p);
-        if (!c) return false;
-        if (selected_) selected_->Select(false);
-        c->Select(true);
-        selected_ = c;
-        //        if (_mode.IsSet(Mode::Editing)) DragStart(p);
-        break;
-      case WM_LBUTTONUP:
-        //if (_mode.IsSet(Mode::Dragging)) DragEnd(p);
-        //else Select(p);
-        break;
-      case WM_LBUTTONDBLCLK:
-        c = GetCard(p);
-        if (!c) return false;
-        {
-          DlgCard dlg(*c);
-          dlg.DoModal();
-        }
-        break;
-      case WM_RBUTTONDOWN:   return false;    // that will skip updating all views
-      case WM_RBUTTONUP:
-        //Unselect();
-        break;
-      case WM_RBUTTONDBLCLK: return false;    // that will skip updating all views
-      case WM_MOVE:
-        //if (_mode.IsSet(Mode::Dragging)) DragTo(p);
-        //else return false;                    // that will skip updating all views
-        break;
-      default: return false;                  // that will skip updating all views
-    }
-    return true;                              // update all views
+    for (auto& c : column_) delete c;
   }
 
 
   Card* Board::GetCard(const CPoint& p) const
   {
-    const Column* col = GetColumn(p);
-    return col ? col->GetCard(p) : nullptr;
-  }
-
-  Column* Board::GetColumn(const CPoint& p) const
-  {
-    for (auto& c : columns_) if (c->PtInColumn(p)) return c;
+    for (const auto& c : column_)
+    {
+      if (c->PtInColumn(p))
+      {
+        return c->GetCard(p);
+      }
+    }
     return nullptr;
   }
 
-
-  void Board::AddColumn(Column* c)
+  void Board::SetHWND(HWND hView) const noexcept { hView_ = hView; }
+  void Board::Draw(CDC* pDC) const
   {
-    columns_.push_back(c);
+    CRect clip;
+    pDC->GetClipBox(&clip);
+
+    CPoint p{ UIDim::horizontalspace, UIDim::verticalspace};
+    for (const auto& c : column_)
+    {
+      if (p.x + (int) c->GetWidth() > clip.left && p.x < clip.right)   // only redraw the column if it is invalid            
+        c->Draw(pDC, p);
+      p.x += c->GetWidth() + UIDim::horizontalspace;
+    }
+    if (dragging_)
+    {
+      //if (!rect_.PtInRect(dragPoint_))
+      //  dragging_ = false;
+      //else
+        selected_->Draw(pDC, dragPoint_, UIStatus::Dragging);
+    }
   }
 
-  void Board::RemoveColumn(Column* c)
+  bool Board::React(unsigned int event, unsigned int nFlags, const CPoint& p)   // react to mouse events
   {
-    columns_.remove(c);
+    switch (event)
+    {
+      case WM_LBUTTONDOWN:
+        selected_ = GetCard(p);                       // find clicked card - could be nullptr
+        if (selected_)
+        {
+          dragging_ = true;                           // any mouse move will now drag this card
+          dragPoint_ = p;
+          CRect r{ dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
+          r.InflateRect(3, 3);
+          ::InvalidateRect(hView_, &r, true);
+        }
+        return false;                                  // redraw views
+      case WM_LBUTTONUP:
+        dragging_ = false;
+        return true;                                 // redraw views
+      case WM_LBUTTONDBLCLK:
+        if (!selected_) return false;                 // no redraw needed
+        else
+        {
+          DlgCard dlg(selected_);
+          dlg.DoModal();
+        }
+        return true;                                  // redraw views
+      case WM_RBUTTONDOWN:
+        return false;                                 // no redraw needed
+      case WM_RBUTTONUP:
+        assert(false);                                // this is an error - context menu should have been called
+        return false;                                 // no redraw needed
+      case WM_RBUTTONDBLCLK:
+        return false;                                 // no redraw needed
+      case WM_MOUSEMOVE:
+        if (!dragging_) return false;                 // no redraw needed
+        {
+          CRect r{ dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
+          r.InflateRect(3, 3);
+          ::InvalidateRect(hView_, &r, true);
+        }
+        dragPoint_ = p;                               // safe current point
+        {
+          CRect r{ dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
+          r.InflateRect(3, 3);
+          ::InvalidateRect(hView_, &r, true);
+        }
+        return false;                                 // do NOT redraw all views every time
+      default:
+        assert(false);                                // this is an error - unhandled mouse event
+        return false;                                 // no redraw needed
+    }
+    //return true;                              // update all views
   }
 
 }
-
-
-//namespace MFC
-//{
-//  using namespace Kanban;
-//
-//  Board* B(void* p) { return reinterpret_cast<Board*>(p); }
-//
-//  Doc::Doc(size_t n) { pImpl_ = new Board(n); }
-//  Doc::Doc(Archive& ar) { pImpl_ = new Board(ar); }
-//  Doc::~Doc(void) { delete B(pImpl_); }
-//  void Doc::Serialize(Archive& ar) { B(pImpl_)->Serialize(ar); }
-//  void Doc::Draw(DC& dc) { B(pImpl_)->Draw(dc); }
-//  bool Doc::React(unsigned int nChar, unsigned int nRepCnt, unsigned int nFlags) { return true; }      // react to keyboard input (not menu shortcuts, but typing)
-//  bool Doc::React(unsigned int command) { return true; }                                               // react to button/menu command
-//  bool Doc::React(unsigned int event, unsigned int nFlags, const Point& p)                             // react to mouse events
-//  { 
-//    switch (event)
-//    {
-//      case Mouse_LButton_Down:
-////        if (_mode.IsSet(Mode::Editing)) DragStart(p);
-//        break;
-//      case Mouse_LButton_Up:
-//        //if (_mode.IsSet(Mode::Dragging)) DragEnd(p);
-//        //else Select(p);
-//        break;
-//      case Mouse_LButton_DblClk:
-//        {
-//          //Card* c = B(pImpl_)->GetCard();
-//          //DlgCard dlg;
-//          //dlg.DoModal();
-//        }
-//        break;
-//      case Mouse_RButton_Down:   return false;    // that will skip updating all views
-//      case Mouse_RButton_Up:
-//        //Unselect();
-//        break;
-//      case Mouse_RButton_DblClk: return false;    // that will skip updating all views
-//      case Mouse_Move:
-//        //if (_mode.IsSet(Mode::Dragging)) DragTo(p);
-//        //else return false;                    // that will skip updating all views
-//        break;
-//      default: return false;                  // that will skip updating all views
-//    }
-//    return true;                              // update all views
-//  }
-//  void Doc::React(MFC::CmdUI* pUI) { }                                                                 // react to UI events (allows to set buttons greyed, etc.)
-//  void Doc::DragStart(const MFC::Point&) {}
-//  void Doc::DragEnd(const MFC::Point&) {}
-//
-//
-//
-//}

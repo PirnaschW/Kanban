@@ -5,17 +5,19 @@ namespace Kanban
   class Card  // a Card
   {
   public:
-    Card(std::wstring title = L"") noexcept;           // create a new Card
-    Card(CArchive* ar);                                // create from file
-    void Serialize(CArchive* ar) const;                // save to file
-    ~Card(void) noexcept;
-    operator ID(void) const noexcept { return ID_; }   // cast to ID
+    Card(std::wstring title = L"") noexcept;                                // create a new Card
+    Card(CArchive* ar);                                                     // create from file
+    void Serialize(CArchive* ar) const;                                     // save to file
+    ~Card(void) noexcept;                                                   
+    operator ID(void) const noexcept { return ID_; }                        // cast to ID
 
     void SetText(std::wstring t) noexcept;
-    void Draw(CDC* pDC, const CPoint& p, UIStatus s, size_t width = 0U) const;   // display card
-    size_t GetWidth(void) const noexcept;              // width of this card
-    size_t GetHeight(void) const noexcept;             // height this card needs / wants
-    bool PtInCard(const CPoint& p) const noexcept;     // check if a point is inside this card
+    void Draw(CDC* pDC, const CPoint& p, UIStatus s, size_t width) const;   // display card
+    void DrawDragged(CDC* pDC, const CPoint& point) const;                  // display card while being dragged
+    CRect GetRect(void) const noexcept;                                     // screen rectangle of this Card
+    size_t GetWidth(void) const noexcept;                                   // width of this card
+    size_t GetHeight(void) const noexcept;                                  // height this card needs / wants
+    bool PtInCard(const CPoint& point, CSize& offset) const noexcept;       // check if a point is inside this card
 
   private:
     CRect GetRectTitle(CDC* pDC) const noexcept;

@@ -30,6 +30,13 @@ public:
 #endif
 
 protected:
+private:
+  // situational & display data
+  Kanban::Card* selected_{ nullptr };    // currently selected / dragged Card
+  bool dragging_{ false };               // currently dragging a card
+  CPoint dragPoint_{};                   // point the Card is dragged to
+  CSize dragOffset_{};                   // offset between click and card corner
+
 
 // Generated message map functions
 protected:

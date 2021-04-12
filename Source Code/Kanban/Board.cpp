@@ -27,19 +27,18 @@ namespace Kanban
   }
 
 
-  Card* Board::GetCard(const CPoint& p) const
+  Card* Board::GetCard(const CPoint& point, CSize& offset) const
   {
     for (const auto& c : column_)
     {
-      if (c->PtInColumn(p))
+      if (c->PtInColumn(point))
       {
-        return c->GetCard(p);
+        return c->GetCard(point,offset);
       }
     }
     return nullptr;
   }
 
-  void Board::SetHWND(HWND hView) const noexcept { hView_ = hView; }
   void Board::Draw(CDC* pDC) const
   {
     CRect clip;
@@ -52,67 +51,6 @@ namespace Kanban
         c->Draw(pDC, p);
       p.x += c->GetWidth() + UIDim::horizontalspace;
     }
-    if (dragging_)
-    {
-      //if (!rect_.PtInRect(dragPoint_))
-      //  dragging_ = false;
-      //else
-        selected_->Draw(pDC, dragPoint_, UIStatus::Dragging);
-    }
-  }
-
-  bool Board::React(unsigned int event, unsigned int nFlags, const CPoint& p)   // react to mouse events
-  {
-    switch (event)
-    {
-      case WM_LBUTTONDOWN:
-        selected_ = GetCard(p);                       // find clicked card - could be nullptr
-        if (selected_)
-        {
-          dragging_ = true;                           // any mouse move will now drag this card
-          dragPoint_ = p;
-          CRect r{ dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
-          r.InflateRect(3, 3);
-          ::InvalidateRect(hView_, &r, true);
-        }
-        return false;                                  // redraw views
-      case WM_LBUTTONUP:
-        dragging_ = false;
-        return true;                                 // redraw views
-      case WM_LBUTTONDBLCLK:
-        if (!selected_) return false;                 // no redraw needed
-        else
-        {
-          DlgCard dlg(selected_);
-          dlg.DoModal();
-        }
-        return true;                                  // redraw views
-      case WM_RBUTTONDOWN:
-        return false;                                 // no redraw needed
-      case WM_RBUTTONUP:
-        assert(false);                                // this is an error - context menu should have been called
-        return false;                                 // no redraw needed
-      case WM_RBUTTONDBLCLK:
-        return false;                                 // no redraw needed
-      case WM_MOUSEMOVE:
-        if (!dragging_) return false;                 // no redraw needed
-        {
-          CRect r{ dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
-          r.InflateRect(3, 3);
-          ::InvalidateRect(hView_, &r, true);
-        }
-        dragPoint_ = p;                               // safe current point
-        {
-          CRect r{ dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
-          r.InflateRect(3, 3);
-          ::InvalidateRect(hView_, &r, true);
-        }
-        return false;                                 // do NOT redraw all views every time
-      default:
-        assert(false);                                // this is an error - unhandled mouse event
-        return false;                                 // no redraw needed
-    }
-    //return true;                              // update all views
   }
 
 }

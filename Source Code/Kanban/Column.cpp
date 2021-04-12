@@ -54,9 +54,14 @@ namespace Kanban {
     pDC->TextOut((rCard_.left + rCard_.right) / 2, rCard_.top + 1, title_.c_str());
 
     // draw all cards
+    CRect clip;
+    pDC->GetClipBox(&clip);
     for (const auto& c : card_)
     {
-      c->Draw(pDC, { rCard_.left, rCard_.bottom + (int) UIDim::verticalspace }, UIStatus::Normal, GetWidth());
+      if (rCard_.bottom + (int) c->GetHeight() > clip.top && rCard_.bottom < clip.bottom)   // only redraw the card if it is invalid
+      {
+        c->Draw(pDC, { rCard_.left, rCard_.bottom + (int) UIDim::verticalspace }, UIStatus::Normal, GetWidth());
+      }
       rCard_.bottom += c->GetHeight() + UIDim::verticalspace;
     }
   }
@@ -66,9 +71,9 @@ namespace Kanban {
   size_t Column::GetHeight(void) const noexcept { return rCard_.Height(); }
 
 
-  Card* Column::GetCard(const CPoint& p) const noexcept
+  Card* Column::GetCard(const CPoint& point, CSize& offset) const noexcept
   {
-    for (const auto& c : card_) if (c->PtInCard(p)) return c;
+    for (const auto& c : card_) if (c->PtInCard(point,offset)) return c;
     return nullptr;
   }
 

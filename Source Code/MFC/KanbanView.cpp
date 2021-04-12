@@ -110,36 +110,69 @@ void CKanbanView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 
 void CKanbanView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-  if (GetDocument()->board_->React(WM_LBUTTONDOWN, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
+  CSize offset{};
+  selected_ = GetDocument()->board_->GetCard(point,offset);  // find clicked card - could be nullptr
+  if (selected_)
+  {
+    dragging_ = true;     // any mouse move will now drag this card
+    dragPoint_ = point;
+    dragOffset_ = offset;
+  }
 }
 
 void CKanbanView::OnLButtonUp(UINT nFlags, CPoint point)
 {
-  if (GetDocument()->board_->React(WM_LBUTTONUP, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
+  if (!selected_) return;
+
+  CRect r{ dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
+  r.OffsetRect(-dragOffset_);
+  r.InflateRect(3, 3);
+  InvalidateRect(&r, true);
+  dragging_ = false;
+  // Note: selected_ still contains the selected Card - it is now Selected
 }
 
 void CKanbanView::OnLButtonDblClk(UINT nFlags, CPoint p)
 {
-  if (GetDocument()->board_->React(WM_LBUTTONDBLCLK, nFlags, p)) GetDocument()->UpdateAllViews(nullptr);
+  if (!selected_) return;
+
+  DlgCard dlg(selected_);
+  dlg.DoModal();
+  selected_->SetText(L"new shorter text!");
+
+  CRect r{ selected_->GetRect() };
+  r.InflateRect(2, 2);
+  r.bottom = (std::numeric_limits<decltype(r.bottom)>::max)();
+  InvalidateRect(&r, true);
 }
 
 void CKanbanView::OnRButtonUp(UINT nFlags, CPoint point)
 {
-  if (GetDocument()->board_->React(WM_RBUTTONUP, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
-  else
-  {
-    ClientToScreen(&point);
-    OnContextMenu(this, point);
-  }
+  ClientToScreen(&point);
+  OnContextMenu(this, point);
 }
 
 void CKanbanView::OnMouseMove(UINT nFlags, CPoint point)
 {
-  GetDocument()->board_->SetHWND(GetSafeHwnd());
-  if (GetDocument()->board_->React(WM_MOUSEMOVE, nFlags, point)) GetDocument()->UpdateAllViews(nullptr);
+  if (!dragging_) return;
+  CRect r = { dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
+  r.OffsetRect(-dragOffset_);
+  r.InflateRect(3, 3);
+  InvalidateRect(&r, true);
+
+  dragPoint_ = point;  // safe current point
+
+  CDC* pDC{ GetDC() };
+  selected_->DrawDragged(pDC, dragPoint_ - dragOffset_);
+  ReleaseDC(pDC);
+
+  r = { dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
+  r.OffsetRect(-dragOffset_);
+  r.InflateRect(2, 2);
+  ValidateRect(&r);
 }
 
 void CKanbanView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-  if (GetDocument()->board_->React(nChar, nRepCnt, nFlags)) GetDocument()->UpdateAllViews(nullptr);
+// ?
 }

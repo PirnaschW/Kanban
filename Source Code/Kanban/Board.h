@@ -10,26 +10,24 @@ namespace Kanban
     void Serialize(CArchive* ar) const;
     ~Board(void) noexcept;
 
-    void SetHWND(HWND hView) const noexcept;
     void Draw(CDC* pDC) const;
     //bool React(unsigned int nChar, unsigned int nRepCnt, unsigned int nFlags);      // react to keyboard input (not menu shortcuts, but typing)
     //bool React(unsigned int command);                                               // react to button/menu command
-    bool React(unsigned int event, unsigned int nFlags, const CPoint& p);             // react to mouse events
     //void React(CCmdUI* pUI);                                                        // react to UI events (allows to set buttons greyed, etc.)
     //void DragTo(const CPoint& p) { dragPoint_ = p; }
     //void DragStart(const CPoint& p);
     //void DragEnd(const CPoint& p);
 
-    Card* GetCard(const CPoint& p) const;
+    Card* GetCard(const CPoint& p, CSize& offset) const;
     Column* GetColumn(const CPoint& p) const;
     //void RemoveColumn(Column* c);
 
   private:
     // situational & display data
-    mutable Card* selected_{ nullptr };   // currently selected / dragged Card
-    mutable bool dragging_{ false };       // currently dragging a card
-    mutable CPoint dragPoint_{};           // point the Card is dragged to
-    mutable HWND hView_{};
+    //mutable Card* selected_{ nullptr };   // currently selected / dragged Card
+    //mutable bool dragging_{ false };       // currently dragging a card
+    //mutable CPoint dragPoint_{};           // point the Card is dragged to
+    //mutable HWND hView_{};
 
     // object data
     std::wstring title_{};

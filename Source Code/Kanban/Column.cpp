@@ -4,15 +4,16 @@ namespace Kanban {
 
   Column::Column(std::wstring title, size_t width) noexcept : ID_(++lastID_), title_(title == L"" ? L"new Column " + std::to_wstring(ID_) : title_), width_(width)
   {
-    card_.reserve(UIDim::dummycards);
-    for (size_t z = 0; z < UIDim::dummycards; ++z)
+    card_.reserve(UI::dummycards);
+    for (size_t z = 0; z < UI::dummycards; ++z)
     {
       //Card* c = new Card();
       //card_.push_back(c);
       Card* c = card_.emplace_back(new Card());
-      std::wstring text = L"Text " + std::to_wstring((ID)*c) + L" ";
-      for (size_t i = 0U; i < 10; ++i) text += L"Lorem a b c Ipsum d e f ";
+      std::wstring text = L"Text " + std::to_wstring((ID) *c) + L" ";
+      for (size_t i = 0U; i < 4U + rand() % 10U; ++i) text += L"Lorem a b c Ipsum d e f ";
       c->SetText(text + L"Lorem Ipsum");
+      c->SetWidth(width_);
     }
   }
   Column::Column(CArchive* ar)
@@ -38,37 +39,55 @@ namespace Kanban {
     for (auto& c : card_) delete c;
   }
 
-  void Column::Draw(CDC* pDC, const CPoint& p) const
+
+
+  CSize Column::CalcSize(CDC* pDC) const noexcept
+  {
+    assert(!bValid_);
+
+    CFont* f = pDC->SelectObject(&UI::fontColumnTitle_.font_);
+    titleLines_ = Lines::BreakLines(UI::fontColumnTitle_, title_, width_ - 5);  // leave 2 pt space on left, and 3 pts on right
+    titleRect_.right = width_;
+    titleRect_.bottom = titleLines_.GetHeight(UI::fontColumnTitle_) + 1; // leave 1 pt space at bottom
+    bValid_ = true;
+
+    CSize size{ (int) width_, (int) UI::verticalspace + titleRect_.bottom };
+    for (const auto& c : card_)
+    {
+      CSize cSize = c->CalcSize(pDC);
+      size.cx = (std::max) (size.cx, cSize.cx);
+      size.cy += cSize.cy + UI::verticalspace;
+    }
+    return size;
+  }
+  void Column::SetWidth(size_t width) noexcept { width_ = width; }
+  size_t Column::GetWidth(void) const noexcept { return width_; }
+  size_t Column::GetHeight(void) const noexcept { return titleRect_.Height(); }
+
+  void Column::Draw(CDC* pDC, const CPoint& point) const
   {
     // calculate target rect
-    rCard_ = { p.x, p.y, p.x + (int) GetWidth(), p.y };
-    // draw column header
-    rCard_.bottom += pDC->DrawText(title_.c_str(), -1, &rCard_, DT_TOP | DT_CENTER) + 1;
+//    rCard_ = { p.x, p.y, p.x + (int) GetWidth(), p.y };
 
-    CRect r{ rCard_ };
-    r.InflateRect(3, 3);
-    pDC->Rectangle(r);
-    r.InflateRect(-2, -2);
-    pDC->Rectangle(r);
-    pDC->SetTextAlign(TA_TOP | TA_CENTER);
-    pDC->TextOut((rCard_.left + rCard_.right) / 2, rCard_.top + 1, title_.c_str());
+// draw column header
+    CFont* f = pDC->SelectObject(&UI::fontColumnTitle_.font_);
+    pDC->SetTextAlign(TA_TOP | TA_CENTER | TA_NOUPDATECP);
+    UI::fontColumnTitle_.DrawMultiText(pDC, point + CSize(titleRect_.Width() / 2, 1), title_, titleLines_);
+    pDC->SelectObject(f);
 
     // draw all cards
     CRect clip;
     pDC->GetClipBox(&clip);
+    CPoint p{ point.x,point.y + (int) titleRect_.Height() + (int) UI::verticalspace };
     for (const auto& c : card_)
     {
-      if (rCard_.bottom + (int) c->GetHeight() > clip.top && rCard_.bottom < clip.bottom)   // only redraw the card if it is invalid
+      if (p.y + (int) c->GetHeight() > clip.top && p.y < clip.bottom)   // only redraw the card if it is invalid            
       {
-        c->Draw(pDC, { rCard_.left, rCard_.bottom + (int) UIDim::verticalspace }, UIStatus::Normal, GetWidth());
+        c->Draw(pDC, { p.x, p.y + (int) UI::verticalspace }, UIStatus::Normal);
       }
-      rCard_.bottom += c->GetHeight() + UIDim::verticalspace;
+      p.y += c->GetHeight() + UI::verticalspace;
     }
   }
-
-  void Column::SetWidth(size_t width) noexcept { width_ = width; }
-  size_t Column::GetWidth(void) const noexcept { return width_; }
-  size_t Column::GetHeight(void) const noexcept { return rCard_.Height(); }
 
 
   Card* Column::GetCard(const CPoint& point, CSize& offset) const noexcept
@@ -79,13 +98,13 @@ namespace Kanban {
 
   bool Column::PtInColumn(const CPoint& p) const noexcept
   {
-    return (rCard_.PtInRect(p));
+    return false; // (rCard_.PtInRect(p));
   }
 
   bool Column::RectInColumn(const CRect& r) const noexcept
   {
     CRect i;
-    i.IntersectRect(r, rCard_);
+ //   i.IntersectRect(r, rCard_);
     return !i.IsRectEmpty();
   }
 

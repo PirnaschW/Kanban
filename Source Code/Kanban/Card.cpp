@@ -17,103 +17,92 @@ namespace Kanban {
   Card::~Card(void) noexcept { }
 
   void Card::SetText(std::wstring t) noexcept { text_ = std::move(t); bValid_ = false; }
+  void Card::SetWidth(size_t width) noexcept { width_ = width;  bValid_ = false; }
+  size_t Card::GetWidth(void) const noexcept { return titleRect_.Width(); }
+  size_t Card::GetHeight(void) const noexcept { return titleRect_.Height() + textRect_.Height(); }
 
-  CRect Card::GetRectTitle(CDC* pDC) const noexcept
+
+  CSize Card::CalcSize(CDC* pDC) const noexcept
   {
-    CRect rTitle{ rCard_ };
-    rTitle.InflateRect(-1, -1);
-    hTitle_ = pDC->DrawText(title_.c_str(), -1, &rTitle, DT_CALCRECT | DT_TOP | DT_CENTER | DT_WORDBREAK);
-    return rTitle;
+    assert(!bValid_);
+
+    CFont* f = pDC->SelectObject(&UI::fontCardTitle_.font_);
+    titleLines_ = Lines::BreakLines(UI::fontCardTitle_, title_, width_ - 5);  // leave 2 pt space on left, and 3 pts on right
+    titleRect_.right = width_;
+    titleRect_.bottom = titleLines_.GetHeight(UI::fontCardTitle_) + 1; // leave 1 pt space at bottom
+
+    pDC->SelectObject(&UI::fontCardText_.font_);
+    textLines_ = Lines::BreakLines(UI::fontCardText_, text_, width_ - 5);    // leave 2 pt space on left, and 3 pts on right
+    textRect_ = titleRect_ + CSize(0, titleRect_.bottom - 1);
+    textRect_.bottom = textRect_.top + textLines_.GetHeight(UI::fontCardText_) + 1; // leave 1 pt space at bottom
+    pDC->SelectObject(f);
+
+    bValid_ = true;
+
+    return { (int) width_,textRect_.bottom };
   }
 
-  void Card::Draw(CDC* pDC, const CPoint& point, UIStatus s, size_t width) const
+  /*void Card::DrawMultiText(CDC* pDC, const CPoint& point, const std::wstring& text, const Lines& l) const
   {
-    if (width != GetWidth() || point!=rCard_.TopLeft()) bValid_ = false;   // if width changed, need to recalculate dimensions
-
-    if (!bValid_ || s == UIStatus::Dragging)  // calculate dimensions if needed
+    size_t toff = 0U;
+    for (const auto& t : l.l_)
     {
-      rCard_ = { point.x, point.y, point.x + (int) width, point.y };
-
-      rTitle_ = rCard_;
-      rTitle_.InflateRect(-1, -1);
-      hTitle_ = pDC->DrawText(title_.c_str(), -1, &rTitle_, DT_CALCRECT | DT_TOP | DT_CENTER | DT_WORDBREAK);
-      rTitle_ = rCard_;
-      rTitle_.InflateRect(-1, -1);
-      rTitle_.bottom += hTitle_ + 2;
-
-      rText_ = rCard_;
-      rText_.InflateRect(-1, -1);
-      rText_.top += hTitle_ + 1;
-      hText_ = pDC->DrawText(text_.c_str(), -1, &rText_, DT_CALCRECT | DT_TOP | DT_LEFT | DT_NOCLIP | DT_WORDBREAK);
-      rText_ = rCard_;
-      rText_.InflateRect(-1, -1);
-      rText_.top += hTitle_ + 3;
-      rText_.bottom += hTitle_ + 5 + hText_;
-
-      rCard_.bottom += hTitle_ + 5 + hText_;
-
-      bValid_ = true;
+      pDC->ExtTextOut(point.x + t.offset.cx, point.y + t.offset.cy, 0U, nullptr, text.c_str() + toff, t.nChars, nullptr);
+      toff += t.nChars;
     }
+  }*/
+
+  void Card::Draw(CDC* pDC, const CPoint& point, UIStatus s) const
+  {
+
+    assert(bValid_);
 
     if (s == UIStatus::Selected)  // if selected, double outline
     {
-      CRect r{ rCard_ };
+      CRect r{ 0,0, titleRect_.Width(), titleRect_.Height() + textRect_.Height() };
+      r.OffsetRect(point);
       r.InflateRect(2, 2);
       pDC->Rectangle(r);
     }
 
     // draw the card itself
-    CBrush b{ RGB(0,0,0) };
-    pDC->FrameRect(rCard_, &b);
-    pDC->FrameRect(rTitle_, &b);
-    pDC->SetTextAlign(TA_TOP | TA_CENTER);
-    pDC->TextOut((rTitle_.left + rTitle_.right) / 2, rTitle_.top, title_.c_str());
-    pDC->SetTextAlign(TA_TOP | TA_LEFT | DT_NOCLIP);
-    pDC->DrawText(text_.c_str(), text_.size(), &rText_, DT_TOP | DT_LEFT | DT_NOCLIP | DT_WORDBREAK);
+    CFont* f = pDC->SelectObject(&UI::fontCardTitle_.font_);
+    pDC->SetTextAlign(TA_TOP | TA_CENTER | TA_NOUPDATECP);
+    UI::fontCardTitle_.DrawMultiText(pDC, point + CSize(titleRect_.Width() / 2, 1), title_, titleLines_);
+
+    pDC->SelectObject(&UI::fontCardText_.font_);
+    pDC->SetTextAlign(TA_TOP | TA_LEFT | TA_NOUPDATECP);
+    UI::fontCardText_.DrawMultiText(pDC, point + CSize(1, titleRect_.Height() + 1), text_, textLines_);
+    pDC->SelectObject(f);
+
+    pDC->FrameRect(titleRect_ + point, &UI::brushFrame_);
+    pDC->FrameRect(textRect_ + point, &UI::brushFrame_);
   }
-  
-  void Card::DrawDragged(CDC* pDC, const CPoint& p) const
+
+  void Card::DrawDragged(CDC* pDC, const CPoint& point) const
   {
-    CSize offset = CPoint{ rCard_.left, rCard_.top } - p;
-    CRect rCard = rCard_ - offset;
-    CRect rTitle = rTitle_ - offset;
-    CRect rText = rText_ - offset;
+    HGDIOBJ hPenOriginal = pDC->SelectObject(UI::penDragging_);  // change Pen
 
-    HPEN hPen{};
-    HGDIOBJ hPenOriginal{};
-//    hPen = ::CreatePen(PS_DOT, 1, BLACK_PEN);
-    hPen = ::CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
-    hPenOriginal = pDC->SelectObject(hPen);
-
-// double outline
-    CRect r{ rCard };
+// double outline and overwrite background
+    CRect r{ 0,0, titleRect_.Width(), titleRect_.Height() + textRect_.Height() };
+    r.OffsetRect(point);
     r.InflateRect(2, 2);
     pDC->Rectangle(r);
 
-    // draw the card itself
-    CBrush b{ RGB(0,0,0) };
-    pDC->FrameRect(rCard, &b);
-    pDC->FrameRect(rTitle, &b);
-    pDC->SetTextAlign(TA_TOP | TA_CENTER);
-    pDC->TextOut((rTitle.left + rTitle.right) / 2, rTitle.top, title_.c_str());
-    pDC->SetTextAlign(TA_TOP | TA_LEFT | DT_NOCLIP);
-    pDC->DrawText(text_.c_str(), text_.size(), &rText, DT_TOP | DT_LEFT | DT_NOCLIP | DT_WORDBREAK);
+    pDC->SelectObject(hPenOriginal);                   // change Pen back
 
-    pDC->SelectObject(hPenOriginal);
-    ::DeleteObject(hPen);  // cleanup
+    // draw the card itself
+    Draw(pDC, point, UIStatus::Normal);
+
   }
 
-  CRect Card::GetRect(void) const noexcept { return rCard_; }
-  size_t Card::GetWidth(void) const noexcept { return rCard_.Width(); }
-  size_t Card::GetHeight(void) const noexcept { return rCard_.Height(); }
-  
   bool Card::PtInCard(const CPoint& point, CSize& offset) const noexcept
   {
-    if (rCard_.PtInRect(point))
-    {
-      offset = CSize{point.x - rCard_.left, point.y - rCard_.top };
-      return true;
-    }
+    //if (rect_.PtInRect(point))
+    //{
+    //  offset = CSize{point.x - rect_.left, point.y - rect_.top };
+    //  return true;
+    //}
     return false;
   }
 

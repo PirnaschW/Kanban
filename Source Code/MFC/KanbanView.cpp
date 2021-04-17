@@ -5,12 +5,12 @@
 #define new DEBUG_NEW
 #endif
 
-IMPLEMENT_DYNCREATE(CKanbanView, CView)
+IMPLEMENT_DYNCREATE(CKanbanView, CScrollView)
 
-BEGIN_MESSAGE_MAP(CKanbanView, CView)
+BEGIN_MESSAGE_MAP(CKanbanView, CScrollView)
   // Standard printing commands
-  ON_COMMAND(ID_FILE_PRINT, &CView::OnFilePrint)
-  ON_COMMAND(ID_FILE_PRINT_DIRECT, &CView::OnFilePrint)
+  ON_COMMAND(ID_FILE_PRINT, &CScrollView::OnFilePrint)
+  ON_COMMAND(ID_FILE_PRINT_DIRECT, &CScrollView::OnFilePrint)
   ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CKanbanView::OnFilePrintPreview)
   ON_WM_CONTEXTMENU()
   ON_WM_LBUTTONDOWN()
@@ -37,7 +37,7 @@ BOOL CKanbanView::PreCreateWindow(CREATESTRUCT& cs)
   // TODO: Modify the Window class or styles here by modifying
   //  the CREATESTRUCT cs
 
-  return CView::PreCreateWindow(cs);
+  return CScrollView::PreCreateWindow(cs);
 }
 
 // CKanbanView drawing
@@ -52,6 +52,15 @@ void CKanbanView::OnDraw(CDC* pDC)
   pDoc->board_->Draw(pDC);
 }
 
+void CKanbanView::OnInitialUpdate()
+{
+  CScrollView::OnInitialUpdate();
+
+  CDC* pDC = GetDC();
+
+  CSize size = GetDocument() ->board_->CalcSize(pDC);
+  SetScrollSizes(MM_TEXT, size);
+}
 
 // CKanbanView printing
 
@@ -84,12 +93,12 @@ void CKanbanView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 #ifdef _DEBUG
 void CKanbanView::AssertValid() const
 {
-  CView::AssertValid();
+  CScrollView::AssertValid();
 }
 
 void CKanbanView::Dump(CDumpContext& dc) const
 {
-  CView::Dump(dc);
+  CScrollView::Dump(dc);
 }
 
 CKanbanDoc* CKanbanView::GetDocument() const // non-debug version is inline
@@ -140,7 +149,7 @@ void CKanbanView::OnLButtonDblClk(UINT nFlags, CPoint p)
   dlg.DoModal();
   selected_->SetText(L"new shorter text!");
 
-  CRect r{ selected_->GetRect() };
+  CRect r{ /*selected_->GetRect()*/ };
   r.InflateRect(2, 2);
   r.bottom = (std::numeric_limits<decltype(r.bottom)>::max)();
   InvalidateRect(&r, true);

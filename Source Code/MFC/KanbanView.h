@@ -1,5 +1,5 @@
 
-class CKanbanView : public CView
+class CKanbanView : public CScrollView
 {
 protected: // create from serialization only
   CKanbanView() noexcept;
@@ -17,6 +17,7 @@ public:
   virtual void OnDraw(CDC* pDC);  // overridden to draw this view
   virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 protected:
+  virtual void OnInitialUpdate(); // called first time after construct
   virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
   virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
   virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);

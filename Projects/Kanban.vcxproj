@@ -206,7 +206,7 @@
     <ClInclude Include="..\Source Code\Kanban\Board.h" />
     <ClInclude Include="..\Source Code\Kanban\Card.h" />
     <ClInclude Include="..\Source Code\Kanban\Column.h" />
-    <ClInclude Include="..\Source Code\Kanban\UIDim.h" />
+    <ClInclude Include="..\Source Code\Kanban\UI.h" />
     <ClInclude Include="..\Source Code\MFC\CArchive-Extensions.h" />
     <ClInclude Include="..\Source Code\MFC\ChildFrm.h" />
     <ClInclude Include="..\Source Code\MFC\DlgCard.h" />
@@ -223,6 +223,7 @@
     <ClCompile Include="..\Source Code\Kanban\Board.cpp" />
     <ClCompile Include="..\Source Code\Kanban\Card.cpp" />
     <ClCompile Include="..\Source Code\Kanban\Column.cpp" />
+    <ClCompile Include="..\Source Code\Kanban\UI.cpp" />
     <ClCompile Include="..\Source Code\MFC\CArchive-Extensions.cpp" />
     <ClCompile Include="..\Source Code\MFC\ChildFrm.cpp" />
     <ClCompile Include="..\Source Code\MFC\DlgCard.cpp" />

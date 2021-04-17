@@ -4,6 +4,7 @@
 // However, files listed here are ALL re-compiled if any one of them is updated between builds.
 // Do not add files here that you will be updating frequently as this negates the performance advantage.
 
+#include <array>
 #include <ctime>
 #include <limits>
 #include <list>
@@ -21,7 +22,7 @@
 #include "CArchive-Extensions.h"
 
 // application classes
-#include "UIDim.h"
+#include "UI.h"
 #include "Card.h"
 #include "Column.h"
 #include "Board.h"

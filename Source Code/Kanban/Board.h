@@ -10,6 +10,7 @@ namespace Kanban
     void Serialize(CArchive* ar) const;
     ~Board(void) noexcept;
 
+    CSize CalcSize(CDC* pDC) const noexcept;
     void Draw(CDC* pDC) const;
     //bool React(unsigned int nChar, unsigned int nRepCnt, unsigned int nFlags);      // react to keyboard input (not menu shortcuts, but typing)
     //bool React(unsigned int command);                                               // react to button/menu command
@@ -32,6 +33,7 @@ namespace Kanban
     // object data
     std::wstring title_{};
     std::vector<Column*> column_{};      // all Columns
+
   };
 
 }

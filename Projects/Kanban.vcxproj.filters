@@ -75,7 +75,7 @@
     <ClInclude Include="..\Source Code\Kanban\Column.h">
       <Filter>Kanban\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source Code\Kanban\UIDim.h">
+    <ClInclude Include="..\Source Code\Kanban\UI.h">
       <Filter>Kanban\Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source Code\MFC\CArchive-Extensions.h">
@@ -115,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="..\Source Code\MFC\CArchive-Extensions.cpp">
       <Filter>MFC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source Code\Kanban\UI.cpp">
+      <Filter>Kanban\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

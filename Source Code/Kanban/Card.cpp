@@ -2,7 +2,7 @@
 
 namespace Kanban {
 
-  Card::Card(std::wstring title) noexcept : ID_(++lastID_), title_(title == L"" ? L"new Card " + std::to_wstring(ID_) : title_) {}
+  Card::Card(std::wstring title) noexcept : ID_(++lastID_), title_(title == L"" ? L"New Card " + std::to_wstring(ID_) : title_) {}
   Card::Card(CArchive* ar)                            // create from file
   {
     *ar >> ID_;
@@ -18,9 +18,9 @@ namespace Kanban {
 
   void Card::SetText(std::wstring t) noexcept { text_ = std::move(t); bValid_ = false; }
   void Card::SetWidth(size_t width) noexcept { width_ = width;  bValid_ = false; }
-  size_t Card::GetWidth(void) const noexcept { return titleRect_.Width(); }
-  size_t Card::GetHeight(void) const noexcept { return titleRect_.Height() + textRect_.Height(); }
-
+  size_t Card::GetWidth(void) const noexcept { return GetSize().cx; }
+  size_t Card::GetHeight(void) const noexcept { return GetSize().cy; }
+  CSize Card::GetSize(void) const noexcept { return { titleRect_.Width(), titleRect_.Height() + textRect_.Height()}; }
 
   CSize Card::CalcSize(CDC* pDC) const noexcept
   {
@@ -39,31 +39,12 @@ namespace Kanban {
 
     bValid_ = true;
 
-    return { (int) width_,textRect_.bottom };
+    return GetSize();
   }
 
-  /*void Card::DrawMultiText(CDC* pDC, const CPoint& point, const std::wstring& text, const Lines& l) const
+  void Card::Draw(CDC* pDC, const CPoint& point, bool saveLoc) const
   {
-    size_t toff = 0U;
-    for (const auto& t : l.l_)
-    {
-      pDC->ExtTextOut(point.x + t.offset.cx, point.y + t.offset.cy, 0U, nullptr, text.c_str() + toff, t.nChars, nullptr);
-      toff += t.nChars;
-    }
-  }*/
-
-  void Card::Draw(CDC* pDC, const CPoint& point, UIStatus s) const
-  {
-
-    assert(bValid_);
-
-    if (s == UIStatus::Selected)  // if selected, double outline
-    {
-      CRect r{ 0,0, titleRect_.Width(), titleRect_.Height() + textRect_.Height() };
-      r.OffsetRect(point);
-      r.InflateRect(2, 2);
-      pDC->Rectangle(r);
-    }
+    assert(bValid_);  // must have been be calculated before, otherwise programming error
 
     // draw the card itself
     CFont* f = pDC->SelectObject(&UI::fontCardTitle_.font_);
@@ -75,35 +56,31 @@ namespace Kanban {
     UI::fontCardText_.DrawMultiText(pDC, point + CSize(1, titleRect_.Height() + 1), text_, textLines_);
     pDC->SelectObject(f);
 
+    // frame afterwards only; otherwise hanging blanks would damage the frame
     pDC->FrameRect(titleRect_ + point, &UI::brushFrame_);
     pDC->FrameRect(textRect_ + point, &UI::brushFrame_);
+
+    if (saveLoc) point_ = point; // buffer Card loction (absolute screen coordinates); this will be used to find the card when clicked
   }
 
   void Card::DrawDragged(CDC* pDC, const CPoint& point) const
   {
-    HGDIOBJ hPenOriginal = pDC->SelectObject(UI::penDragging_);  // change Pen
-
-// double outline and overwrite background
-    CRect r{ 0,0, titleRect_.Width(), titleRect_.Height() + textRect_.Height() };
+    // when dragged, the card gets a double outline, and we need to clear the background
+    CRect r{ {0,0}, GetSize() };
     r.OffsetRect(point);
     r.InflateRect(2, 2);
-    pDC->Rectangle(r);
+    HGDIOBJ hPenOriginal = pDC->SelectObject(UI::penDragging_);  // change Pen
+    pDC->Rectangle(r);                                           // use method Rectangle, not FrameRect, to clear background
+    pDC->SelectObject(hPenOriginal);                             // change Pen back
 
-    pDC->SelectObject(hPenOriginal);                   // change Pen back
-
-    // draw the card itself
-    Draw(pDC, point, UIStatus::Normal);
-
+    // now draw the card itself, but don't save location
+    Draw(pDC, point, false);
   }
 
   bool Card::PtInCard(const CPoint& point, CSize& offset) const noexcept
   {
-    //if (rect_.PtInRect(point))
-    //{
-    //  offset = CSize{point.x - rect_.left, point.y - rect_.top };
-    //  return true;
-    //}
-    return false;
+    offset = point - point_;
+    return offset.cx >= 0 && offset.cx < GetSize().cx && offset.cy >= 0 && offset.cy < GetSize().cy;
   }
 
 }

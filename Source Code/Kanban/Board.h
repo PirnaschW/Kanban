@@ -24,13 +24,6 @@ namespace Kanban
     //void RemoveColumn(Column* c);
 
   private:
-    // situational & display data
-    //mutable Card* selected_{ nullptr };   // currently selected / dragged Card
-    //mutable bool dragging_{ false };       // currently dragging a card
-    //mutable CPoint dragPoint_{};           // point the Card is dragged to
-    //mutable HWND hView_{};
-
-    // object data
     std::wstring title_{};
     std::vector<Column*> column_{};      // all Columns
 

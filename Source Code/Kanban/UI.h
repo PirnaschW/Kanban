@@ -6,7 +6,6 @@ namespace Kanban
   {
     Normal = 0x00,
     Selected = 0x01,
-    Dragging = 0x02,
   };
 
   using ID = size_t;   // object IDs, to be able to map and serialize relationships
@@ -57,7 +56,9 @@ namespace Kanban
 
   public:  // reusable GDI objects
     static const inline CPen penDragging_{ PS_SOLID, 2, RGB(255, 0, 0) };
+    static const inline CPen penSelected_{ PS_SOLID, 2, RGB(0, 255, 0) };
     static inline CBrush brushFrame_{ RGB(0,0,0) };
+    static inline CBrush brushSelected_{ RGB(0,0,255) };
     static Font fontColumnTitle_;
     static Font fontCardTitle_;
     static Font fontCardText_;

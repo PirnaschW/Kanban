@@ -2,7 +2,7 @@
 
 namespace Kanban {
 
-  Column::Column(std::wstring title, size_t width) noexcept : ID_(++lastID_), title_(title == L"" ? L"new Column " + std::to_wstring(ID_) : title_), width_(width)
+  Column::Column(std::wstring title, size_t width) noexcept : ID_(++lastID_), title_(title == L"" ? L"New Column " + std::to_wstring(ID_) : title_), width_(width)
   {
     card_.reserve(UI::dummycards);
     for (size_t z = 0; z < UI::dummycards; ++z)
@@ -51,42 +51,49 @@ namespace Kanban {
     titleRect_.bottom = titleLines_.GetHeight(UI::fontColumnTitle_) + 1; // leave 1 pt space at bottom
     bValid_ = true;
 
-    CSize size{ (int) width_, (int) UI::verticalspace + titleRect_.bottom };
+    size_ = { (int) width_, (int) UI::verticalspace + titleRect_.bottom };
     for (const auto& c : card_)
     {
       CSize cSize = c->CalcSize(pDC);
-      size.cx = (std::max) (size.cx, cSize.cx);
-      size.cy += cSize.cy + UI::verticalspace;
+      size_.cx = (std::max) (size_.cx, cSize.cx);
+      size_.cy += cSize.cy + UI::verticalspace;
     }
-    return size;
+    return size_;
   }
-  void Column::SetWidth(size_t width) noexcept { width_ = width; }
+  void Column::SetWidth(size_t width) noexcept { width_ = width; bValid_ = false; }
   size_t Column::GetWidth(void) const noexcept { return width_; }
   size_t Column::GetHeight(void) const noexcept { return titleRect_.Height(); }
+  CSize Column::GetSize(void) const noexcept { return size_; }
 
-  void Column::Draw(CDC* pDC, const CPoint& point) const
+  void Column::Draw(CDC* pDC, const CPoint& point, bool saveLoc) const
   {
-    // calculate target rect
-//    rCard_ = { p.x, p.y, p.x + (int) GetWidth(), p.y };
+    assert(bValid_);  // must have been be calculated before, otherwise programming error
 
-// draw column header
-    CFont* f = pDC->SelectObject(&UI::fontColumnTitle_.font_);
-    pDC->SetTextAlign(TA_TOP | TA_CENTER | TA_NOUPDATECP);
-    UI::fontColumnTitle_.DrawMultiText(pDC, point + CSize(titleRect_.Width() / 2, 1), title_, titleLines_);
-    pDC->SelectObject(f);
-
-    // draw all cards
     CRect clip;
     pDC->GetClipBox(&clip);
-    CPoint p{ point.x,point.y + (int) titleRect_.Height() + (int) UI::verticalspace };
+
+    CPoint p{ point };
+    if (p.y + (int) GetHeight() > clip.top && p.y < clip.bottom)   // only draw the column header if it is inside clip rectangle
+    {
+      CFont* f = pDC->SelectObject(&UI::fontColumnTitle_.font_);
+      pDC->SetTextAlign(TA_TOP | TA_CENTER | TA_NOUPDATECP);
+      UI::fontColumnTitle_.DrawMultiText(pDC, point + CSize(titleRect_.Width() / 2, 1), title_, titleLines_);
+      pDC->SelectObject(f);
+    }
+    p.y += titleRect_.Height() + UI::verticalspace;
+
+    // draw all cards
     for (const auto& c : card_)
     {
-      if (p.y + (int) c->GetHeight() > clip.top && p.y < clip.bottom)   // only redraw the card if it is invalid            
+      p.y += UI::verticalspace;
+      if (p.y + (int) c->GetHeight() > clip.top && p.y < clip.bottom)   // only draw the card if it is inside clip rectangle  
       {
-        c->Draw(pDC, { p.x, p.y + (int) UI::verticalspace }, UIStatus::Normal);
+        c->Draw(pDC, p);
       }
-      p.y += c->GetHeight() + UI::verticalspace;
+      p.y += c->GetHeight();
     }
+
+    if (saveLoc) point_ = point; // buffer Card loction (absolute screen coordinates); this will be used to find the card when clicked
   }
 
 
@@ -96,15 +103,16 @@ namespace Kanban {
     return nullptr;
   }
 
-  bool Column::PtInColumn(const CPoint& p) const noexcept
+  bool Column::PtInColumn(const CPoint& point) const noexcept
   {
-    return false; // (rCard_.PtInRect(p));
+    CSize offset = point - point_;
+    return offset.cx >= 0 && offset.cx < GetSize().cx && offset.cy >= 0 && offset.cy < GetSize().cy;
   }
 
   bool Column::RectInColumn(const CRect& r) const noexcept
   {
-    CRect i;
- //   i.IntersectRect(r, rCard_);
+    CRect i{ point_, point_ + size_ };
+    i &= r;
     return !i.IsRectEmpty();
   }
 

@@ -13,13 +13,12 @@ namespace Kanban
 
     CSize CalcSize(CDC* pDC) const noexcept;
     void SetText(std::wstring t) noexcept;
-    //CRect GetRect(void) const noexcept;                                     // screen rectangle of this Card
     void SetWidth(size_t width) noexcept;                                   // set the width of this card
     size_t GetWidth(void) const noexcept;                                   // get the width of this card
     size_t GetHeight(void) const noexcept;                                  // get the height this card needs / wants
+    CSize GetSize(void) const noexcept;                                     // overall size of this Card
 
-    void Draw(CDC* pDC, const CPoint& p, UIStatus s) const;                 // display card
-    //void DrawMultiText(CDC* pDC, const CPoint& point, const std::wstring& s, const Lines& l) const;
+    void Draw(CDC* pDC, const CPoint& p, bool saveLoc = true) const;        // display card
     void DrawDragged(CDC* pDC, const CPoint& point) const;                  // display card while being dragged
     bool PtInCard(const CPoint& point, CSize& offset) const noexcept;       // check if a point is inside this card
 
@@ -40,10 +39,11 @@ namespace Kanban
     size_t color_{ 0 };
 
   private:
-    mutable bool bValid_{ false };              // buffered data is valid
-    mutable CRect titleRect_{ 0,0,0,0 };        // Title frame
+    mutable CPoint point_{ 0,0 };               // Card location (absolute screen coordinates)
+    mutable bool bValid_{ false };              // further buffered data is valid
+    mutable CRect titleRect_{ 0,0,0,0 };        // Title frame (Card-relative coordinates)
     mutable Lines titleLines_{};                // Title broken into lines
-    mutable CRect textRect_{ 0,0,0,0 };         // Text frame
+    mutable CRect textRect_{ 0,0,0,0 };         // Text frame (Card-relative coordinates)
     mutable Lines textLines_{};                 // Text broken into lines
   };
 

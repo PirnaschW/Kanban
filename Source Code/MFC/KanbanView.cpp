@@ -119,6 +119,15 @@ void CKanbanView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 
 void CKanbanView::OnLButtonDown(UINT nFlags, CPoint point)
 {
+  if (selected_)
+  {
+    CSize offset;
+    selected_->PtInCard({ 0,0 }, offset);
+    CRect r0{ CPoint{-offset}, selected_->GetSize() };
+    r0.InflateRect(2, 2);
+    InvalidateRect(&r0,true);
+  }
+
   CSize offset{};
   selected_ = GetDocument()->board_->GetCard(point,offset);  // find clicked card - could be nullptr
   if (selected_)
@@ -133,12 +142,22 @@ void CKanbanView::OnLButtonUp(UINT nFlags, CPoint point)
 {
   if (!selected_) return;
 
-  CRect r{ dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
+  CRect r{ dragPoint_, selected_->GetSize() };
   r.OffsetRect(-dragOffset_);
   r.InflateRect(3, 3);
   InvalidateRect(&r, true);
   dragging_ = false;
   // Note: selected_ still contains the selected Card - it is now Selected
+
+  // the selected card gets a double outline
+  CDC* pDC{ GetDC() };
+  CSize offset;
+  selected_->PtInCard({ 0,0 }, offset);
+  CRect r0{ CPoint{-offset}, selected_->GetSize() };
+  r0.InflateRect(2, 2);
+  ValidateRect(&r0);
+  pDC->Rectangle(r0);    // use method Rectangle, not FrameRect, to clear background
+  selected_->Draw(pDC, CPoint(-offset), false);
 }
 
 void CKanbanView::OnLButtonDblClk(UINT nFlags, CPoint p)
@@ -163,21 +182,33 @@ void CKanbanView::OnRButtonUp(UINT nFlags, CPoint point)
 
 void CKanbanView::OnMouseMove(UINT nFlags, CPoint point)
 {
+  static size_t z = 0U;
+  z++;
+
   if (!dragging_) return;
-  CRect r = { dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
+  CRect r{ dragPoint_, selected_->GetSize() };
   r.OffsetRect(-dragOffset_);
   r.InflateRect(3, 3);
   InvalidateRect(&r, true);
 
   dragPoint_ = point;  // safe current point
 
-  CDC* pDC{ GetDC() };
-  selected_->DrawDragged(pDC, dragPoint_ - dragOffset_);
-  ReleaseDC(pDC);
-
-  r = { dragPoint_.x, dragPoint_.y, dragPoint_.x + (int) selected_->GetWidth(), dragPoint_.y + (int) selected_->GetHeight() };
+  if (z > 400)
+  {
+    z++;
+  }
+  r = { dragPoint_, selected_->GetSize() };
   r.OffsetRect(-dragOffset_);
   r.InflateRect(2, 2);
+  CDC* pDC{ GetDC() };
+  // when dragged, the card gets a double outline, and we need to clear the background
+  HGDIOBJ hPenOriginal = pDC->SelectObject(Kanban::UI::penDragging_);  // change Pen
+  pDC->Rectangle(r);                                           // use method Rectangle, not FrameRect, to clear background
+  pDC->SelectObject(hPenOriginal);                             // change Pen back
+
+  selected_->Draw(pDC, dragPoint_ - dragOffset_,false); // draw the card itself, but don't save location
+  ReleaseDC(pDC);
+
   ValidateRect(&r);
 }
 

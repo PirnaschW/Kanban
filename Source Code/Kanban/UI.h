@@ -57,22 +57,23 @@ namespace Kanban
     constexpr static size_t default_cardheight{ 80U };                                   // defaultheight of new cards
 
   public:  // reusable GDI objects
-    static inline const unsigned char shadowGray_{ 80 };
-    static inline const unsigned char cardGray_{ 224 };
-    static inline const unsigned char columnGray_{ 192 };
-    static inline const COLORREF backgroundColor_{ RGB(255,255,255) };
-    static inline const COLORREF shadowColor_{ RGB(shadowGray_, shadowGray_, shadowGray_) };
-    static inline const COLORREF cardColor_{ RGB(cardGray_, cardGray_, cardGray_) };
-    static inline const COLORREF columnColor_{ RGB(columnGray_, columnGray_, columnGray_) };
-    static inline CPen penShadow_{ PS_SOLID, 1, shadowColor_ };
-    static inline CPen penCard_{ PS_SOLID, 1, cardColor_ };
-    static inline const CPen penDragging_{ PS_SOLID, 2, RGB(255, 0, 0) };
-    static inline const CPen penSelected_{ PS_SOLID, 2, RGB(0, 255, 0) };
-    static inline CBrush brushBackground_{ backgroundColor_ };
-    static inline CBrush brushShadow_{ shadowColor_ };
-    static inline CBrush brushCard_{ cardColor_ };
-    static inline CBrush brushFrame_{ RGB(0,0,0) };
-    static inline CBrush brushSelected_{ RGB(0,0,255) };
+    static const unsigned char backgroundGray_;   // general window background
+    static const unsigned char shadowGray_;       // drop shadows
+    static const unsigned char cardGray_;         // card surface
+    static const unsigned char columnGray_;       // column header
+    static const COLORREF backgroundColor_;
+    static const COLORREF shadowColor_;
+    static const COLORREF cardColor_;
+    static const COLORREF columnColor_;
+    static CPen penShadow_;
+    static CPen penCard_;
+    static const CPen penDragging_;
+    static const CPen penSelected_;
+    static CBrush brushBackground_;
+    static CBrush brushShadow_;
+    static CBrush brushCard_;
+    static CBrush brushFrame_;
+    static CBrush brushSelected_;
     static Font fontColumnTitle_;
     static Font fontCardTitle_;
     static Font fontCardText_;

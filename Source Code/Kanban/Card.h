@@ -15,6 +15,7 @@ namespace Kanban
     bool Edit(void);                                  // edit the Card data (in a dialog)
     void SetText(std::wstring t) noexcept;            // set the text of the Card
     void SetWidth(size_t width) noexcept;             // set the width of this card
+    void SetColor(COLORREF color) noexcept;           // set the color of the card
 
 // sizing and drawing
     CSize CalcSize(CDC* pDC) const noexcept;          // calculate Card size and text line breaks
@@ -24,7 +25,8 @@ namespace Kanban
 
     void Draw(CDC* pDC, const CPoint& p, bool saveLoc = true) const noexcept; // display card
     bool PtInCard(const CPoint& point, CSize& offset) const noexcept;         // check if a point is inside this card
-    //void Invalidate(CDC* pDC) const noexcept;         // invalidate Card rectangle
+    bool CardInRect(const CRect& clip) const noexcept;                        // check if Card needs redraw (intersecting anywhere with the clip rectangle)
+
 
   private:
     ID ID_{};
@@ -40,11 +42,12 @@ namespace Kanban
     time_t actual_start_{ 0LL };
     time_t actual_end_{ 0LL };
     size_t type_{ 0 };
-    size_t color_{ 0 };
+    COLORREF color_{ 0x00ffffff };
 
   private:
     mutable CPoint point_{ 0,0 };               // Card location (absolute screen coordinates)
     mutable bool bValid_{ false };              // further buffered data is valid
+    mutable CRect rect_{ 0,0,0,0 };             // Card frame (Card-relative coordinates)
     mutable CRect titleRect_{ 0,0,0,0 };        // Title frame (Card-relative coordinates)
     mutable Lines titleLines_{};                // Title broken into lines
     mutable CRect textRect_{ 0,0,0,0 };         // Text frame (Card-relative coordinates)

@@ -29,24 +29,35 @@ namespace Kanban {
   }
   void Card::SetText(std::wstring t) noexcept { text_ = std::move(t); bValid_ = false; }
   void Card::SetWidth(size_t width) noexcept { width_ = width;  bValid_ = false; }
-  size_t Card::GetWidth(void) const noexcept { return GetSize().cx; }
-  size_t Card::GetHeight(void) const noexcept { return GetSize().cy; }
-  CSize Card::GetSize(void) const noexcept { return { titleRect_.Width(), titleRect_.Height() + textRect_.Height()}; }
+  void Card::SetColor(COLORREF color) noexcept { color_ = color; }
+  size_t Card::GetWidth(void) const noexcept { return width_; }
+  size_t Card::GetHeight(void) const noexcept { return rect_.Height(); }
+  CSize Card::GetSize(void) const noexcept { return { (int) GetWidth(), (int) GetHeight() }; }
 
   CSize Card::CalcSize(CDC* pDC) const noexcept
   {
     assert(!bValid_);
 
+    // Title:
     CFont* f = pDC->SelectObject(&UI::fontCardTitle_.font_);
-    titleLines_ = Lines::BreakLines(UI::fontCardTitle_, title_, width_ - 5);  // leave 2 pt space on left, and 3 pts on right
-    titleRect_.right = width_;
-    titleRect_.bottom = titleLines_.GetHeight(UI::fontCardTitle_) + 1; // leave 1 pt space at bottom
+    titleRect_.top = 1;              // leave 1 pts space on top
+    titleRect_.left = 4;             // leave 4 pts space on left
+    titleRect_.right = width_ - 5;   // leave 5 pts space on right
+    titleLines_ = Lines::BreakLines(UI::fontCardTitle_, title_, titleRect_.right - titleRect_.left);  
+    titleRect_.bottom = titleRect_.top + titleLines_.GetHeight(UI::fontCardTitle_) + 2; // leave 2 pts space at bottom
 
+    // Text:
     pDC->SelectObject(&UI::fontCardText_.font_);
-    textLines_ = Lines::BreakLines(UI::fontCardText_, text_, width_ - 5);    // leave 2 pt space on left, and 3 pts on right
+    textRect_.top = titleRect_.bottom + 1;  // leave 1 pts space on top
+    textRect_.left = 4;                     // leave 4 pts space on left
+    textRect_.right = width_ - 5;           // leave 5 pts space on right
+    textLines_ = Lines::BreakLines(UI::fontCardText_, text_, textRect_.right - textRect_.left);
     textRect_ = titleRect_ + CSize(0, titleRect_.bottom - 1);
-    textRect_.bottom = textRect_.top + textLines_.GetHeight(UI::fontCardText_) + 1; // leave 1 pt space at bottom
+    textRect_.bottom = textRect_.top + textLines_.GetHeight(UI::fontCardText_) + 2; // leave 2 pt space at bottom
     pDC->SelectObject(f);
+
+    rect_.right = width_;
+    rect_.bottom = textRect_.bottom;
 
     bValid_ = true;
 
@@ -59,37 +70,34 @@ namespace Kanban {
 
     // draw the card itself
 
-    // drop shadows
+    // drop shadows - they are going 'outside' of rect
     CBrush* b = pDC->SelectObject(&UI::brushShadow_);
     CPen* p = pDC->SelectObject(&UI::penShadow_);
-    CRect shadowB{ textRect_.left + point.x + (int) UI::shadowoffset, textRect_.bottom + point.y,
-                  textRect_.right + point.x + (int) UI::shadowoffset,  textRect_.bottom + point.y + (int) UI::shadowoffset };
+    CRect shadowB{ rect_.left + point.x + (int) UI::shadowoffset, rect_.bottom + point.y,
+                   rect_.right + point.x + (int) UI::shadowoffset,  rect_.bottom + point.y + (int) UI::shadowoffset };
     pDC->Rectangle(shadowB);
-    CRect shadowR{ titleRect_.right + point.x, titleRect_.top + point.y + (int) UI::shadowoffset,
-                   titleRect_.right + point.x + (int) UI::shadowoffset,  textRect_.bottom + point.y + (int) UI::shadowoffset };
+    CRect shadowR{ rect_.right + point.x, rect_.top + point.y + (int) UI::shadowoffset,
+                   rect_.right + point.x + (int) UI::shadowoffset,  rect_.bottom + point.y + (int) UI::shadowoffset };
     pDC->Rectangle(shadowR);
 
     // main card
-    pDC->SelectObject(&UI::brushCard_);
+    CBrush b0(color_);
+    pDC->SelectObject(&b0);
     pDC->SelectObject(&UI::penCard_);
-    pDC->RoundRect(titleRect_ + point, CPoint(UI::roundcorners, UI::roundcorners));
-    pDC->RoundRect(textRect_ + point, CPoint(UI::roundcorners, UI::roundcorners));
+    pDC->RoundRect(rect_ + point, CPoint(UI::roundcorners, UI::roundcorners));
     pDC->SelectObject(p);
     pDC->SelectObject(b);
 
-    pDC->SetBkColor(UI::cardColor_);
+    COLORREF bk = pDC->SetBkColor(color_);
     CFont* f = pDC->SelectObject(&UI::fontCardTitle_.font_);
     pDC->SetTextAlign(TA_TOP | TA_CENTER | TA_NOUPDATECP);
-    UI::fontCardTitle_.DrawMultiText(pDC, point + CSize(titleRect_.Width() / 2, 1), title_, titleLines_);
+    UI::fontCardTitle_.DrawMultiText(pDC, point + CSize((titleRect_.left + titleRect_.right) / 2, titleRect_.top), title_, titleLines_);
 
     pDC->SelectObject(&UI::fontCardText_.font_);
     pDC->SetTextAlign(TA_TOP | TA_LEFT | TA_NOUPDATECP);
-    UI::fontCardText_.DrawMultiText(pDC, point + CSize(1, titleRect_.Height() + 1), text_, textLines_);
+    UI::fontCardText_.DrawMultiText(pDC, point + CSize(textRect_.left, textRect_.top), text_, textLines_);
     pDC->SelectObject(f);
-
-    // frame afterwards only; otherwise hanging blanks would damage the frame
-    //pDC->FrameRect(titleRect_ + point, &UI::brushFrame_);
-    //pDC->FrameRect(textRect_ + point, &UI::brushFrame_);
+    pDC->SetBkColor(bk);
 
     if (saveLoc) point_ = point; // buffer Card loction (absolute screen coordinates); this will be used to find the card when clicked
   }
@@ -97,7 +105,14 @@ namespace Kanban {
   bool Card::PtInCard(const CPoint& point, CSize& offset) const noexcept
   {
     offset = point - point_;
-    return offset.cx >= 0 && offset.cx < GetSize().cx && offset.cy >= 0 && offset.cy < GetSize().cy;
+    return offset.cx >= 0 && offset.cx < (int) width_ && offset.cy >= 0 && offset.cy < rect_.Height();
+  }
+
+  bool Card::CardInRect(const CRect& clip) const noexcept
+  {
+    return
+      point_.y + rect_.bottom + (int) UI::shadowoffset >= clip.top && point_.y + rect_.top < clip.bottom &&
+      point_.x + rect_.right + (int) UI::shadowoffset >= clip.left && point_.x + rect_.left < clip.right;
   }
 
 }

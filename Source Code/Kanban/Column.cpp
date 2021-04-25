@@ -14,6 +14,7 @@ namespace Kanban {
       for (size_t i = 0U; i < 4U + rand() % 10U; ++i) text += L"Lorem a b c Ipsum d e f ";
       c->SetText(text + L"Lorem Ipsum");
       c->SetWidth(width_);
+      c->SetColor(RGB(220 + rand() % 32, 240 + rand() % 16, 220 + rand() % 32));
     }
   }
   Column::Column(CArchive* ar)
@@ -51,7 +52,7 @@ namespace Kanban {
     titleRect_.bottom = titleLines_.GetHeight(UI::fontColumnTitle_) + 1; // leave 1 pt space at bottom
     bValid_ = true;
 
-    size_ = { (int) width_, (int) UI::verticalspace + titleRect_.bottom };
+    size_ = { (int) width_, (int) UI::verticalspace + titleRect_.bottom + (int) UI::shadowoffset };
     for (const auto& c : card_)
     {
       CSize cSize = c->CalcSize(pDC);
@@ -84,14 +85,12 @@ namespace Kanban {
     for (const auto& c : card_)
     {
       p.y += UI::verticalspace;
-      if (p.y + (int) c->GetHeight() > clip.top && p.y < clip.bottom)   // only draw the card if it is inside clip rectangle  
-      {
+      if (c->CardInRect(clip))
         c->Draw(pDC, p);
-      }
       p.y += c->GetHeight();
     }
 
-    if (saveLoc) point_ = point; // buffer Card loction (absolute screen coordinates); this will be used to find the card when clicked
+    if (saveLoc) point_ = point; // buffer Column loction (absolute screen coordinates); this will be used to find the column when clicked
   }
 
 

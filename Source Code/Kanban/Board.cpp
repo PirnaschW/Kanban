@@ -74,8 +74,7 @@ namespace Kanban
     CPoint p{ UI::horizontalspace, UI::verticalspace};
     for (const auto& c : column_)
     {
-      if (p.x + (int) c->GetWidth() > clip.left && p.x < clip.right)   // only redraw the column if it is invalid            
-        c->Draw(pDC, clip, p);
+      c->Draw(pDC, clip, p);
       p.x += c->GetWidth() + UI::horizontalspace;
     }
   }

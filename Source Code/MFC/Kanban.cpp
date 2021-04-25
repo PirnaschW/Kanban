@@ -154,6 +154,8 @@ protected:
 // Implementation
 protected:
   DECLARE_MESSAGE_MAP()
+public:
+//    afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };
 
 CAboutDlg::CAboutDlg() noexcept : CDialogEx(IDD_ABOUTBOX)
@@ -166,6 +168,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+//    ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 // App command to run the dialog
@@ -195,6 +198,3 @@ void CKanbanApp::SaveCustomState()
 }
 
 // CKanbanApp message handlers
-
-
-

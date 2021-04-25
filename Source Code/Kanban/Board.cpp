@@ -5,7 +5,7 @@ namespace Kanban
 
   Board::Board(size_t n) noexcept : title_(L"Kanban Board " + std::to_wstring(n))
   {
-    column_.reserve(UI::dummycolumns);
+    //column_.reserve(UI::dummycolumns);
     for (size_t z = 0; z < UI::dummycolumns; ++z)
       column_.push_back(new Column(L"", 120U + rand() % 120));
   }
@@ -13,9 +13,9 @@ namespace Kanban
   {
     size_t z;
     *ar >> title_ >> z;
-    column_.reserve(z);
+    //column_.reserve(z);
 
-    for (size_t i = 0U; i < z; ++i) column_.push_back(new Column(ar));   // read complete column from archive
+    for (size_t i = 0U; i < z; ++i) column_.emplace_back(new Column(ar));   // read complete column from archive
   }
   void Board::Serialize(CArchive* ar) const
   {
@@ -69,16 +69,13 @@ namespace Kanban
     return nullptr;
   }
 
-  void Board::Draw(CDC* pDC) const
+  void Board::Draw(CDC* pDC, const CRect& clip) const
   {
-    CRect clip;
-    pDC->GetClipBox(&clip);
-
     CPoint p{ UI::horizontalspace, UI::verticalspace};
     for (const auto& c : column_)
     {
       if (p.x + (int) c->GetWidth() > clip.left && p.x < clip.right)   // only redraw the column if it is invalid            
-        c->Draw(pDC, p);
+        c->Draw(pDC, clip, p);
       p.x += c->GetWidth() + UI::horizontalspace;
     }
   }

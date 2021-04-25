@@ -30,14 +30,19 @@ public:
   virtual void Dump(CDumpContext& dc) const;
 #endif
 
+public:
+  void OnResizeStart();   // called from ChildFrm
+  void OnResizeEnd();     // called from ChildFrm
+
 protected:
 private:
   // situational & display data
   Kanban::Card* selected_{ nullptr };    // currently selected / dragged Card
   bool dragging_{ false };               // currently dragging a card
+  bool resizing_{ false };               // currently resizing the view
   CPoint dragPoint_{};                   // point the Card is dragged to
   CSize dragOffset_{};                   // offset between click and card corner
-
+  CRect oldsize_{};                      // client size when resizing starts
 
 // Generated message map functions
 protected:
@@ -52,6 +57,9 @@ protected:
   afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
   //}}AFX_MSG
   DECLARE_MESSAGE_MAP()
+public:
+    afx_msg void OnSize(UINT nType, int cx, int cy);
+    afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };
 
 #ifndef _DEBUG  // debug version in KanbanView.cpp

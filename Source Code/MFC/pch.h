@@ -30,9 +30,9 @@
 // generated files
 #include "Kanban.h"
 #include "MainFrm.h"
-#include "ChildFrm.h"
 #include "KanbanDoc.h"
 #include "KanbanView.h"
+#include "ChildFrm.h"
 #include "DlgCard.h"
 
 

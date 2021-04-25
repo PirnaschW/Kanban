@@ -18,6 +18,8 @@ BEGIN_MESSAGE_MAP(CKanbanView, CScrollView)
   ON_WM_LBUTTONDBLCLK()
   ON_WM_MOUSEMOVE()
   ON_WM_CHAR()
+  ON_WM_SIZE()
+  ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 // CKanbanView construction/destruction
@@ -49,7 +51,33 @@ void CKanbanView::OnDraw(CDC* pDC)
   if (!pDoc)
     return;
 
-  pDoc->board_->Draw(pDC);
+
+  if (resizing_)
+  {
+    CRect client{};
+    GetClientRect(&client);
+  //    ValidateRect(oldsize_);
+    if (client.bottom > oldsize_.bottom)
+    {
+      CRect b{ 0,oldsize_.bottom,oldsize_.right,client.bottom };
+      pDoc->board_->Draw(pDC, b);
+//      InvalidateRect(b, true);
+    }
+    if (client.right > oldsize_.right)
+    {
+      CRect r{ oldsize_.right,0,client.right,client.bottom };
+      //InvalidateRect(r, true);
+      pDoc->board_->Draw(pDC, r);
+    }
+    oldsize_ = client;
+  }
+
+  else
+  {
+    CRect clip{};
+    pDC->GetClipBox(&clip);
+    pDoc->board_->Draw(pDC, clip);
+  }
 }
 
 void CKanbanView::OnInitialUpdate()
@@ -160,18 +188,16 @@ void CKanbanView::OnLButtonUp(UINT nFlags, CPoint point)
   selected_->Draw(pDC, CPoint(-offset), false);
 }
 
-void CKanbanView::OnLButtonDblClk(UINT nFlags, CPoint p)
+void CKanbanView::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
   if (!selected_) return;
 
-  DlgCard dlg(selected_);
-  dlg.DoModal();
-  selected_->SetText(L"new shorter text!");
-
-  CRect r{ /*selected_->GetRect()*/ };
-  r.InflateRect(2, 2);
-  r.bottom = (std::numeric_limits<decltype(r.bottom)>::max)();
-  InvalidateRect(&r, true);
+  CRect r{ dragPoint_, selected_->GetSize() };
+  r.OffsetRect(-dragOffset_);
+  r.InflateRect(3, 3);
+  r.bottom = GetTotalSize().cy;
+  
+  if (selected_->Edit()) InvalidateRect(&r, true);  // if Card was changed, invalidate it and all Cards below it
 }
 
 void CKanbanView::OnRButtonUp(UINT nFlags, CPoint point)
@@ -182,9 +208,6 @@ void CKanbanView::OnRButtonUp(UINT nFlags, CPoint point)
 
 void CKanbanView::OnMouseMove(UINT nFlags, CPoint point)
 {
-  static size_t z = 0U;
-  z++;
-
   if (!dragging_) return;
   CRect r{ dragPoint_, selected_->GetSize() };
   r.OffsetRect(-dragOffset_);
@@ -193,10 +216,6 @@ void CKanbanView::OnMouseMove(UINT nFlags, CPoint point)
 
   dragPoint_ = point;  // safe current point
 
-  if (z > 400)
-  {
-    z++;
-  }
   r = { dragPoint_, selected_->GetSize() };
   r.OffsetRect(-dragOffset_);
   r.InflateRect(2, 2);
@@ -215,4 +234,72 @@ void CKanbanView::OnMouseMove(UINT nFlags, CPoint point)
 void CKanbanView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 // ?
+}
+
+
+void CKanbanView::OnSize(UINT nType, int cx, int cy)
+{
+ // CScrollView::OnSize(nType, cx, cy);
+  //if (resizing_)
+  //{
+  //  ValidateRect(oldsize_);
+  //  CRect client{};
+  //  GetClientRect(&client);
+  //  if (client.bottom > oldsize_.bottom)
+  //  {
+  //    CRect b{ 0,oldsize_.bottom,client.right,client.bottom };
+  //    InvalidateRect(b, true);
+  //  }
+  //  if (client.right > oldsize_.right)
+  //  {
+  //    CRect r{ oldsize_.right,0,client.right,client.bottom };
+  //    InvalidateRect(r, true);
+  //  }
+
+  //  oldsize_ = client;
+  //}
+}
+
+
+void CKanbanView::OnResizeStart()
+{
+  resizing_ = true;
+  GetClientRect(&oldsize_);
+}
+
+
+void CKanbanView::OnResizeEnd()
+{
+  resizing_ = false;
+
+  CRect client{};
+  GetClientRect(&client);
+//  InvalidateRect(client, true);
+
+//  ValidateRect(oldsize_);
+}
+
+
+BOOL CKanbanView::OnEraseBkgnd(CDC* pDC)
+{
+  if (resizing_)
+  {
+    CRect client{};
+    GetClientRect(&client);
+  //    ValidateRect(oldsize_);
+    if (client.bottom > oldsize_.bottom)
+    {
+      CRect b{ 0,oldsize_.bottom,oldsize_.right,client.bottom };
+      pDC->FillRect(b, &Kanban::UI::brushBackground_);
+    }
+    if (client.right > oldsize_.right)
+    {
+      CRect r{ oldsize_.right,0,client.right,client.bottom };
+      pDC->FillRect(r, &Kanban::UI::brushBackground_);
+    }
+    return false;
+  }
+
+  else
+    return CScrollView::OnEraseBkgnd(pDC);
 }

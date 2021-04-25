@@ -11,7 +11,7 @@ namespace Kanban
     ~Board(void) noexcept;
 
     CSize CalcSize(CDC* pDC) const noexcept;
-    void Draw(CDC* pDC) const;
+    void Draw(CDC* pDC, const CRect& clip) const;
     //bool React(unsigned int nChar, unsigned int nRepCnt, unsigned int nFlags);      // react to keyboard input (not menu shortcuts, but typing)
     //bool React(unsigned int command);                                               // react to button/menu command
     //void React(CCmdUI* pUI);                                                        // react to UI events (allows to set buttons greyed, etc.)
@@ -25,7 +25,7 @@ namespace Kanban
 
   private:
     std::wstring title_{};
-    std::vector<Column*> column_{};      // all Columns
+    std::list<Column*> column_{};      // all Columns
 
   };
 

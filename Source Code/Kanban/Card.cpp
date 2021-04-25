@@ -16,6 +16,17 @@ namespace Kanban {
   }
   Card::~Card(void) noexcept { }
 
+  bool Card::Edit(void)
+  {
+    DlgCard dlg(this);
+    if (dlg.DoModal() == IDOK)
+    {
+      SetText(L"new shorter text!");
+      bValid_ = false;
+      return true;
+    }
+    return false;
+  }
   void Card::SetText(std::wstring t) noexcept { text_ = std::move(t); bValid_ = false; }
   void Card::SetWidth(size_t width) noexcept { width_ = width;  bValid_ = false; }
   size_t Card::GetWidth(void) const noexcept { return GetSize().cx; }
@@ -42,11 +53,31 @@ namespace Kanban {
     return GetSize();
   }
 
-  void Card::Draw(CDC* pDC, const CPoint& point, bool saveLoc) const
+  void Card::Draw(CDC* pDC, const CPoint& point, bool saveLoc) const noexcept
   {
-    assert(bValid_);  // must have been be calculated before, otherwise programming error
+    if (!bValid_) CalcSize(pDC);
 
     // draw the card itself
+
+    // drop shadows
+    CBrush* b = pDC->SelectObject(&UI::brushShadow_);
+    CPen* p = pDC->SelectObject(&UI::penShadow_);
+    CRect shadowB{ textRect_.left + point.x + (int) UI::shadowoffset, textRect_.bottom + point.y,
+                  textRect_.right + point.x + (int) UI::shadowoffset,  textRect_.bottom + point.y + (int) UI::shadowoffset };
+    pDC->Rectangle(shadowB);
+    CRect shadowR{ titleRect_.right + point.x, titleRect_.top + point.y + (int) UI::shadowoffset,
+                   titleRect_.right + point.x + (int) UI::shadowoffset,  textRect_.bottom + point.y + (int) UI::shadowoffset };
+    pDC->Rectangle(shadowR);
+
+    // main card
+    pDC->SelectObject(&UI::brushCard_);
+    pDC->SelectObject(&UI::penCard_);
+    pDC->RoundRect(titleRect_ + point, CPoint(UI::roundcorners, UI::roundcorners));
+    pDC->RoundRect(textRect_ + point, CPoint(UI::roundcorners, UI::roundcorners));
+    pDC->SelectObject(p);
+    pDC->SelectObject(b);
+
+    pDC->SetBkColor(UI::cardColor_);
     CFont* f = pDC->SelectObject(&UI::fontCardTitle_.font_);
     pDC->SetTextAlign(TA_TOP | TA_CENTER | TA_NOUPDATECP);
     UI::fontCardTitle_.DrawMultiText(pDC, point + CSize(titleRect_.Width() / 2, 1), title_, titleLines_);
@@ -57,24 +88,10 @@ namespace Kanban {
     pDC->SelectObject(f);
 
     // frame afterwards only; otherwise hanging blanks would damage the frame
-    pDC->FrameRect(titleRect_ + point, &UI::brushFrame_);
-    pDC->FrameRect(textRect_ + point, &UI::brushFrame_);
+    //pDC->FrameRect(titleRect_ + point, &UI::brushFrame_);
+    //pDC->FrameRect(textRect_ + point, &UI::brushFrame_);
 
     if (saveLoc) point_ = point; // buffer Card loction (absolute screen coordinates); this will be used to find the card when clicked
-  }
-
-  void Card::DrawDragged(CDC* pDC, const CPoint& point) const
-  {
-    // when dragged, the card gets a double outline, and we need to clear the background
-    CRect r{ {0,0}, GetSize() };
-    r.OffsetRect(point);
-    r.InflateRect(2, 2);
-    HGDIOBJ hPenOriginal = pDC->SelectObject(UI::penDragging_);  // change Pen
-    pDC->Rectangle(r);                                           // use method Rectangle, not FrameRect, to clear background
-    pDC->SelectObject(hPenOriginal);                             // change Pen back
-
-    // now draw the card itself, but don't save location
-    Draw(pDC, point, false);
   }
 
   bool Card::PtInCard(const CPoint& point, CSize& offset) const noexcept

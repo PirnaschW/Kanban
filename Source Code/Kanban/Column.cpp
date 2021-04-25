@@ -4,7 +4,7 @@ namespace Kanban {
 
   Column::Column(std::wstring title, size_t width) noexcept : ID_(++lastID_), title_(title == L"" ? L"New Column " + std::to_wstring(ID_) : title_), width_(width)
   {
-    card_.reserve(UI::dummycards);
+    //card_.reserve(UI::dummycards);
     for (size_t z = 0; z < UI::dummycards; ++z)
     {
       //Card* c = new Card();
@@ -23,9 +23,9 @@ namespace Kanban {
 
     size_t z;
     *ar >> title_ >> width_ >> z;
-    card_.reserve(z);
+    //card_.reserve(z);
     for (size_t i = 0U; i < z; ++i)
-      card_.push_back(new Card(ar));
+      card_.emplace_back(new Card(ar));
   }
   void Column::Serialize(CArchive* ar) const
   {
@@ -65,16 +65,14 @@ namespace Kanban {
   size_t Column::GetHeight(void) const noexcept { return titleRect_.Height(); }
   CSize Column::GetSize(void) const noexcept { return size_; }
 
-  void Column::Draw(CDC* pDC, const CPoint& point, bool saveLoc) const
+  void Column::Draw(CDC* pDC, const CRect& clip, const CPoint& point, bool saveLoc) const
   {
     assert(bValid_);  // must have been be calculated before, otherwise programming error
-
-    CRect clip;
-    pDC->GetClipBox(&clip);
 
     CPoint p{ point };
     if (p.y + (int) GetHeight() > clip.top && p.y < clip.bottom)   // only draw the column header if it is inside clip rectangle
     {
+      pDC->SetBkColor(UI::columnColor_);
       CFont* f = pDC->SelectObject(&UI::fontColumnTitle_.font_);
       pDC->SetTextAlign(TA_TOP | TA_CENTER | TA_NOUPDATECP);
       UI::fontColumnTitle_.DrawMultiText(pDC, point + CSize(titleRect_.Width() / 2, 1), title_, titleLines_);

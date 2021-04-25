@@ -10,7 +10,7 @@ namespace Kanban
 
   using ID = size_t;   // object IDs, to be able to map and serialize relationships
 
-  
+
   // multiline text breakup helpers
   struct Font;
   class Line
@@ -47,16 +47,30 @@ namespace Kanban
     constexpr static size_t dummycolumns{ 10U };                                         // # of columns to create while testing
     constexpr static size_t dummycards{ 8U };                                            // # of cards per column to create while testing
   public:
-    constexpr static size_t horizontalspace{ 10U };                                      // horizontal space between columns
-    constexpr static size_t verticalspace{ 10U };                                        // vertical space between cards
+    constexpr static size_t horizontalspace{ 20U };                                      // horizontal space between columns
+    constexpr static size_t verticalspace{ 12U };                                        // vertical space between cards
+    constexpr static size_t roundcorners{ 4U };                                          // corner roudning radius
+    constexpr static size_t shadowoffset{ 3U };                                          // size of drop shadow
     constexpr static size_t default_columnwidth{ 200U };                                 // default width of new columns
     constexpr static size_t default_columnheight{ 20U };                                 // height of column header
     constexpr static size_t default_cardwidth{ default_columnwidth - horizontalspace };  // default width of new cards
     constexpr static size_t default_cardheight{ 80U };                                   // defaultheight of new cards
 
   public:  // reusable GDI objects
-    static const inline CPen penDragging_{ PS_SOLID, 2, RGB(255, 0, 0) };
-    static const inline CPen penSelected_{ PS_SOLID, 2, RGB(0, 255, 0) };
+    static inline const unsigned char shadowGray_{ 80 };
+    static inline const unsigned char cardGray_{ 224 };
+    static inline const unsigned char columnGray_{ 192 };
+    static inline const COLORREF backgroundColor_{ RGB(255,255,255) };
+    static inline const COLORREF shadowColor_{ RGB(shadowGray_, shadowGray_, shadowGray_) };
+    static inline const COLORREF cardColor_{ RGB(cardGray_, cardGray_, cardGray_) };
+    static inline const COLORREF columnColor_{ RGB(columnGray_, columnGray_, columnGray_) };
+    static inline CPen penShadow_{ PS_SOLID, 1, shadowColor_ };
+    static inline CPen penCard_{ PS_SOLID, 1, cardColor_ };
+    static inline const CPen penDragging_{ PS_SOLID, 2, RGB(255, 0, 0) };
+    static inline const CPen penSelected_{ PS_SOLID, 2, RGB(0, 255, 0) };
+    static inline CBrush brushBackground_{ backgroundColor_ };
+    static inline CBrush brushShadow_{ shadowColor_ };
+    static inline CBrush brushCard_{ cardColor_ };
     static inline CBrush brushFrame_{ RGB(0,0,0) };
     static inline CBrush brushSelected_{ RGB(0,0,255) };
     static Font fontColumnTitle_;

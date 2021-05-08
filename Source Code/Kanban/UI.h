@@ -51,10 +51,15 @@ namespace Kanban
     constexpr static size_t verticalspace{ 12U };                                        // vertical space between cards
     constexpr static size_t roundcorners{ 4U };                                          // corner roudning radius
     constexpr static size_t shadowoffset{ 3U };                                          // size of drop shadow
+    constexpr static size_t placeholderWidth{ 4U };                                      // width of the placeholder frame
     constexpr static size_t default_columnwidth{ 200U };                                 // default width of new columns
     constexpr static size_t default_columnheight{ 20U };                                 // height of column header
     constexpr static size_t default_cardwidth{ default_columnwidth - horizontalspace };  // default width of new cards
-    constexpr static size_t default_cardheight{ 80U };                                   // defaultheight of new cards
+    constexpr static size_t default_cardheight{ 80U };                                   // default height of new cards
+
+  public:  // GDI related helper functions
+    static COLORREF Darken(COLORREF c, int amount) noexcept;    // calculate a color that is 'amount' darker than the given one
+    static COLORREF Lighten(COLORREF c, int amount) noexcept;   // calculate a color that is 'amount' lighter than the given one
 
   public:  // reusable GDI objects
     static const unsigned char backgroundGray_;   // general window background
@@ -65,6 +70,7 @@ namespace Kanban
     static const COLORREF shadowColor_;
     static const COLORREF cardColor_;
     static const COLORREF columnColor_;
+    static CPen penBackground_;
     static CPen penShadow_;
     static CPen penCard_;
     static const CPen penDragging_;

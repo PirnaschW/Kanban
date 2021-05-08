@@ -5,27 +5,28 @@ namespace Kanban
   class Card  // a Card
   {
   public:
-    Card(std::wstring title = L"") noexcept;          // create a new Card
-    Card(CArchive* ar);                               // create from file
-    void Serialize(CArchive* ar) const;               // save to file
-    ~Card(void) noexcept;                             // destructor
-    operator ID(void) const noexcept { return ID_; }  // cast to ID
+    Card(std::wstring title = L"") noexcept;            // create a new Card
+    Card(CArchive* ar);                                 // create from file
+    void Serialize(CArchive* ar) const;                 // save to file
+    ~Card(void) noexcept;                               // destructor
+    operator ID(void) const noexcept { return ID_; }    // cast to ID
+                                                        
+// modifying the Card                                   
+    bool Edit(void);                                    // edit the Card data (in a dialog)
+    void SetText(std::wstring t) noexcept;              // set the text of the Card
+    void SetWidth(size_t width) noexcept;               // set the width of this card
+    void SetColor(COLORREF color) noexcept;             // set the color of the card
+                                                        
+// sizing and drawing                                   
+    CSize CalcSize(CDC* pDC) const noexcept;            // calculate Card size and text line breaks
+    CSize GetSize(bool shadow = false) const noexcept;  // overall size of this Card (with or without shadow)
 
-// modifying the Card
-    bool Edit(void);                                  // edit the Card data (in a dialog)
-    void SetText(std::wstring t) noexcept;            // set the text of the Card
-    void SetWidth(size_t width) noexcept;             // set the width of this card
-    void SetColor(COLORREF color) noexcept;           // set the color of the card
-
-// sizing and drawing
-    CSize CalcSize(CDC* pDC) const noexcept;          // calculate Card size and text line breaks
-    size_t GetWidth(void) const noexcept;             // get the width of this card
-    size_t GetHeight(void) const noexcept;            // get the height this card needs / wants
-    CSize GetSize(void) const noexcept;               // overall size of this Card
-
-    void Draw(CDC* pDC, const CPoint& p, bool saveLoc = true) const noexcept; // display card
+    void Draw(CDC* pDC, const CRect& clip, const CPoint& point, bool saveLoc = true) const noexcept; // display card
+    CRect DrawPlaceholder(CDC* pDC, const CSize& scrolled) const noexcept;                           // display placeholder
     bool PtInCard(const CPoint& point, CSize& offset) const noexcept;         // check if a point is inside this card
-    bool CardInRect(const CRect& clip) const noexcept;                        // check if Card needs redraw (intersecting anywhere with the clip rectangle)
+
+  private:
+    bool CardInRect(const CRect& clip, const CPoint& point) const noexcept;   // check if Card needs redraw (intersecting anywhere with the clip rectangle)
 
 
   private:
@@ -42,7 +43,7 @@ namespace Kanban
     time_t actual_start_{ 0LL };
     time_t actual_end_{ 0LL };
     size_t type_{ 0 };
-    COLORREF color_{ 0x00ffffff };
+    COLORREF color_{};
 
   private:
     mutable CPoint point_{ 0,0 };               // Card location (absolute screen coordinates)

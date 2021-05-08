@@ -12,9 +12,10 @@ namespace Kanban
   const COLORREF UI::shadowColor_{ RGB(shadowGray_, shadowGray_, shadowGray_) };
   const COLORREF UI::cardColor_{ RGB(backgroundGray_, cardGray_, backgroundGray_) };
   const COLORREF UI::columnColor_{ RGB(columnGray_, columnGray_, columnGray_) };
+  CPen UI::penBackground_{ PS_SOLID, 1, backgroundColor_ };
   CPen UI::penShadow_{ PS_SOLID, 1, shadowColor_ };
   CPen UI::penCard_{ PS_SOLID, 1, cardColor_ };
-  const CPen UI::penDragging_{ PS_SOLID, 2, RGB(255, 0, 0) };
+  const CPen UI::penDragging_{ PS_SOLID, 1, RGB(255, 0, 0) };
   const CPen UI::penSelected_{ PS_SOLID, 2, RGB(0, 255, 0) };
   CBrush UI::brushBackground_{ backgroundColor_ };
   CBrush UI::brushShadow_{ shadowColor_ };
@@ -118,5 +119,11 @@ namespace Kanban
     if (tl.nChars > 0U) l.l_.push_back(tl);
     return l;
   }
+
+  COLORREF UI::Darken(COLORREF color, int amount) noexcept
+  {
+    return RGB(GetRValue(color) - amount, GetGValue(color) - amount, GetBValue(color) - amount);
+  }
+  COLORREF UI::Lighten(COLORREF color, int amount) noexcept { return Darken(color, -amount); }
 
 }

@@ -14,7 +14,7 @@ namespace Kanban {
       for (size_t i = 0U; i < 4U + rand() % 10U; ++i) text += L"Lorem a b c Ipsum d e f ";
       c->SetText(text + L"Lorem Ipsum");
       c->SetWidth(width_);
-      c->SetColor(RGB(220 + rand() % 32, 240 + rand() % 16, 220 + rand() % 32));
+      c->SetColor(RGB(224 + rand() % 32, 224 + rand() % 32, 224 + rand() % 32));
     }
   }
   Column::Column(CArchive* ar)
@@ -85,9 +85,8 @@ namespace Kanban {
     for (const auto& c : card_)
     {
       p.y += UI::verticalspace;
-      if (c->CardInRect(clip))
-        c->Draw(pDC, p);
-      p.y += c->GetHeight();
+      c->Draw(pDC,clip,p);
+      p.y += c->GetSize().cy;
     }
 
     if (saveLoc) point_ = point; // buffer Column loction (absolute screen coordinates); this will be used to find the column when clicked

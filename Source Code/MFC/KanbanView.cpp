@@ -151,12 +151,13 @@ void CKanbanView::OnLButtonDown(UINT nFlags, CPoint point)
   {
     CSize offset;
     selected_->PtInCard({ 0,0 }, offset);
-    CRect r0{ CPoint{-offset}, selected_->GetSize() };
-    r0.InflateRect(2, 2);
+    CRect r0{ CPoint{-offset}, selected_->GetSize(true) };
+//    r0.InflateRect(2, 2);
     InvalidateRect(&r0,true);
   }
 
   CSize offset{};
+  point += GetScrollPosition();
   selected_ = GetDocument()->board_->GetCard(point,offset);  // find clicked card - could be nullptr
   if (selected_)
   {
@@ -164,37 +165,46 @@ void CKanbanView::OnLButtonDown(UINT nFlags, CPoint point)
     dragPoint_ = point;
     dragOffset_ = offset;
   }
+  else
+  {
+    dragging_ = false;
+  }
 }
 
 void CKanbanView::OnLButtonUp(UINT nFlags, CPoint point)
 {
   if (!selected_) return;
 
-  CRect r{ dragPoint_, selected_->GetSize() };
-  r.OffsetRect(-dragOffset_);
-  r.InflateRect(3, 3);
+  CSize scrolled{ GetScrollPosition() };
+  // invalidate the last place the Card was dragged to
+  CRect r{ dragPoint_, selected_->GetSize(true) };
+  r.OffsetRect(-dragOffset_ - scrolled);
   InvalidateRect(&r, true);
   dragging_ = false;
   // Note: selected_ still contains the selected Card - it is now Selected
 
-  // the selected card gets a double outline
-  CDC* pDC{ GetDC() };
+  // invalidate the home of the Card
   CSize offset;
-  selected_->PtInCard({ 0,0 }, offset);
-  CRect r0{ CPoint{-offset}, selected_->GetSize() };
-  r0.InflateRect(2, 2);
-  ValidateRect(&r0);
-  pDC->Rectangle(r0);    // use method Rectangle, not FrameRect, to clear background
-  selected_->Draw(pDC, CPoint(-offset), false);
+  selected_->PtInCard({ 0,0 }, offset);   // trick to read Card's screen coordinates
+  CRect r0{ CPoint{-offset - scrolled}, selected_->GetSize(true) };
+  InvalidateRect(&r0);
+
+  // the selected card gets a double outline
+  //CDC* pDC{ GetDC() };
+  //CSize offset;
+  //selected_->PtInCard({ 0,0 }, offset);
+  //CRect r0{ CPoint{-offset}, selected_->GetSize(true) };
+  //ValidateRect(&r0);
+  //pDC->Rectangle(r0);    // use method Rectangle, not FrameRect, to clear background
+  //selected_->Draw(pDC, r0, CPoint(-offset), false);
 }
 
 void CKanbanView::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
   if (!selected_) return;
 
-  CRect r{ dragPoint_, selected_->GetSize() };
+  CRect r{ dragPoint_, selected_->GetSize(true) };
   r.OffsetRect(-dragOffset_);
-  r.InflateRect(3, 3);
   r.bottom = GetTotalSize().cy;
   
   if (selected_->Edit()) InvalidateRect(&r, true);  // if Card was changed, invalidate it and all Cards below it
@@ -209,23 +219,22 @@ void CKanbanView::OnRButtonUp(UINT nFlags, CPoint point)
 void CKanbanView::OnMouseMove(UINT nFlags, CPoint point)
 {
   if (!dragging_) return;
-  CRect r{ dragPoint_, selected_->GetSize() };
-  r.OffsetRect(-dragOffset_);
-  r.InflateRect(3, 3);
+
+  CSize scrolled{ GetScrollPosition() };
+
+  CRect r{ dragPoint_ - dragOffset_ - scrolled, selected_->GetSize(true) };
+ // r.OffsetRect(-dragOffset_);
+  r.InflateRect(1, 1, 3, 3);
   InvalidateRect(&r, true);
 
-  dragPoint_ = point;  // safe current point
+  dragPoint_ = point + scrolled;  // safe current point
 
-  r = { dragPoint_, selected_->GetSize() };
-  r.OffsetRect(-dragOffset_);
-  r.InflateRect(2, 2);
-  CDC* pDC{ GetDC() };
+  r = { dragPoint_, selected_->GetSize(true) };
+  r.OffsetRect(-dragOffset_ - scrolled);
   // when dragged, the card gets a double outline, and we need to clear the background
-  HGDIOBJ hPenOriginal = pDC->SelectObject(Kanban::UI::penDragging_);  // change Pen
-  pDC->Rectangle(r);                                           // use method Rectangle, not FrameRect, to clear background
-  pDC->SelectObject(hPenOriginal);                             // change Pen back
-
-  selected_->Draw(pDC, dragPoint_ - dragOffset_,false); // draw the card itself, but don't save location
+  CDC* pDC{ GetDC() };
+  ValidateRect(selected_->DrawPlaceholder(pDC,scrolled));               // draw a placeholder in original location
+  selected_->Draw(pDC, r, dragPoint_ - dragOffset_ - scrolled, false);     // draw the card at the mouse position, but don't save location
   ReleaseDC(pDC);
 
   ValidateRect(&r);

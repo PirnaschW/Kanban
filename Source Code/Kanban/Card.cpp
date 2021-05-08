@@ -30,9 +30,10 @@ namespace Kanban {
   void Card::SetText(std::wstring t) noexcept { text_ = std::move(t); bValid_ = false; }
   void Card::SetWidth(size_t width) noexcept { width_ = width;  bValid_ = false; }
   void Card::SetColor(COLORREF color) noexcept { color_ = color; }
-  size_t Card::GetWidth(void) const noexcept { return width_; }
-  size_t Card::GetHeight(void) const noexcept { return rect_.Height(); }
-  CSize Card::GetSize(void) const noexcept { return { (int) GetWidth(), (int) GetHeight() }; }
+  CSize Card::GetSize(bool shadow) const noexcept
+  {
+    return { (int) width_ + (shadow ? (int) UI::shadowoffset : 0), rect_.Height() + (shadow ? (int) UI::shadowoffset : 0) };
+  }
 
   CSize Card::CalcSize(CDC* pDC) const noexcept
   {
@@ -61,14 +62,16 @@ namespace Kanban {
 
     bValid_ = true;
 
-    return GetSize();
+    return GetSize(false);
   }
 
-  void Card::Draw(CDC* pDC, const CPoint& point, bool saveLoc) const noexcept
+  void Card::Draw(CDC* pDC, const CRect& clip, const CPoint& point, bool saveLoc) const noexcept
   {
     if (!bValid_) CalcSize(pDC);
 
-    // draw the card itself
+    if (saveLoc) point_ = point; // buffer Card loction (absolute screen coordinates); this will be used to find the card when clicked
+
+    if (!CardInRect(clip, point)) return; // don't draw it if it is not invalid
 
     // drop shadows - they are going 'outside' of rect
     CBrush* b = pDC->SelectObject(&UI::brushShadow_);
@@ -98,8 +101,25 @@ namespace Kanban {
     UI::fontCardText_.DrawMultiText(pDC, point + CSize(textRect_.left, textRect_.top), text_, textLines_);
     pDC->SelectObject(f);
     pDC->SetBkColor(bk);
+  }
 
-    if (saveLoc) point_ = point; // buffer Card loction (absolute screen coordinates); this will be used to find the card when clicked
+
+  CRect Card::DrawPlaceholder(CDC* pDC, const CSize& scrolled) const noexcept
+  {
+    assert(bValid_);
+
+    // draw a placeholder box only - no shadow
+    CBrush b0(UI::Darken(color_, 16));
+    CBrush* b = pDC->SelectObject(&b0);
+    CPen p0{ PS_SOLID, UI::placeholderWidth, UI::Darken(color_,64) };
+    CPen* p = pDC->SelectObject(&p0);
+    CRect r{ rect_ + point_ - scrolled };
+    CRect rp{ r };
+    rp.DeflateRect(UI::placeholderWidth / 2, UI::placeholderWidth / 2, UI::placeholderWidth / 2 - 1, UI::placeholderWidth / 2 - 1);
+    pDC->Rectangle(rp);
+    pDC->SelectObject(p);
+    pDC->SelectObject(b);
+    return r;
   }
 
   bool Card::PtInCard(const CPoint& point, CSize& offset) const noexcept
@@ -108,11 +128,11 @@ namespace Kanban {
     return offset.cx >= 0 && offset.cx < (int) width_ && offset.cy >= 0 && offset.cy < rect_.Height();
   }
 
-  bool Card::CardInRect(const CRect& clip) const noexcept
+  bool Card::CardInRect(const CRect& clip, const CPoint& point) const noexcept
   {
     return
-      point_.y + rect_.bottom + (int) UI::shadowoffset >= clip.top && point_.y + rect_.top < clip.bottom &&
-      point_.x + rect_.right + (int) UI::shadowoffset >= clip.left && point_.x + rect_.left < clip.right;
+      point.y + rect_.bottom + (int) UI::shadowoffset >= clip.top && point.y + rect_.top < clip.bottom &&
+      point.x + rect_.right + (int) UI::shadowoffset >= clip.left && point.x + rect_.left < clip.right;
   }
 
 }

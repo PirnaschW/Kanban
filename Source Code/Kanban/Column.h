@@ -15,7 +15,7 @@ namespace Kanban
     void SetWidth(size_t width) noexcept;                              // set width for this Column (user input)
     size_t GetWidth() const noexcept;                                  // Column width
     size_t GetHeight() const noexcept;                                 // Column header height
-    Card* GetCard(const CPoint& p, CSize& offset) const noexcept;      // find card under this point
+    itCard GetCard(const CPoint& p, CSize& offset) const noexcept;      // find card under this point
                                                                        
     void Draw(CDC* pDC, const CRect& clip, const CPoint& p, bool saveLoc = true) const;   // display Column starting at p
     bool PtInColumn(const CPoint& p) const noexcept;                   
@@ -31,7 +31,6 @@ namespace Kanban
     size_t wip_limit_{ 0 };
     std::wstring exit_rule_{};
     size_t width_{UI::default_columnwidth};     // user-defined column width
-    std::list<Card*> card_{};                 // all Cards
 
   private:
     mutable CPoint point_{ 0,0 };               // Column location (absolute screen coordinates)
@@ -41,5 +40,7 @@ namespace Kanban
     mutable CSize size_{ 0,0 };                 // total Column size (including all cards)
 
   };
+
+  using itColumn = std::list<Column*>::const_iterator;
 
 }

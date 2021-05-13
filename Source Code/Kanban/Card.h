@@ -1,6 +1,8 @@
 
 namespace Kanban
 {
+  class Column;
+  using itColumn = std::list<Column*>::const_iterator;
 
   class Card  // a Card
   {
@@ -16,7 +18,9 @@ namespace Kanban
     void SetText(std::wstring t) noexcept;              // set the text of the Card
     void SetWidth(size_t width) noexcept;               // set the width of this card
     void SetColor(COLORREF color) noexcept;             // set the color of the card
-                                                        
+    void SetColumn(const itColumn& c) noexcept;         // set the column this card shows in
+    itColumn GetColumn(void) const noexcept;            // get the column this card shows in
+
 // sizing and drawing                                   
     CSize CalcSize(CDC* pDC) const noexcept;            // calculate Card size and text line breaks
     CSize GetSize(bool shadow = false) const noexcept;  // overall size of this Card (with or without shadow)
@@ -44,6 +48,7 @@ namespace Kanban
     time_t actual_end_{ 0LL };
     size_t type_{ 0 };
     COLORREF color_{};
+    itColumn column_{};
 
   private:
     mutable CPoint point_{ 0,0 };               // Card location (absolute screen coordinates)
@@ -54,5 +59,7 @@ namespace Kanban
     mutable CRect textRect_{ 0,0,0,0 };         // Text frame (Card-relative coordinates)
     mutable Lines textLines_{};                 // Text broken into lines
   };
+
+  using itCard = std::list<Card*>::const_iterator;
 
 }

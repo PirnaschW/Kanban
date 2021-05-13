@@ -19,14 +19,15 @@ namespace Kanban
     //void DragStart(const CPoint& p);
     //void DragEnd(const CPoint& p);
 
-    Card* GetCard(const CPoint& p, CSize& offset) const;
-    Column* GetColumn(const CPoint& p) const;
+    itCard NoCard() const noexcept;                                   // get cend() of the Card list
+    itCard GetCard(const CPoint& p, CSize& offset) const noexcept;    // find a card inthe list from a point
+    itColumn GetColumn(const CPoint& p) const noexcept;               // find a column from a point
     //void RemoveColumn(Column* c);
 
   private:
     std::wstring title_{};
+    std::list<Card*> card_{};          // all Cards
     std::list<Column*> column_{};      // all Columns
-
   };
 
 }

@@ -4,42 +4,20 @@ namespace Kanban {
 
   Column::Column(std::wstring title, size_t width) noexcept : ID_(++lastID_), title_(title == L"" ? L"New Column " + std::to_wstring(ID_) : title_), width_(width)
   {
-    //card_.reserve(UI::dummycards);
-    for (size_t z = 0; z < UI::dummycards; ++z)
-    {
-      //Card* c = new Card();
-      //card_.push_back(c);
-      Card* c = card_.emplace_back(new Card());
-      std::wstring text = L"Text " + std::to_wstring((ID) *c) + L" ";
-      for (size_t i = 0U; i < 4U + rand() % 10U; ++i) text += L"Lorem a b c Ipsum d e f ";
-      c->SetText(text + L"Lorem Ipsum");
-      c->SetWidth(width_);
-      c->SetColor(RGB(224 + rand() % 32, 224 + rand() % 32, 224 + rand() % 32));
-    }
   }
   Column::Column(CArchive* ar)
   {
     *ar >> ID_;
     if (lastID_ < ID_) lastID_ = ID_;
 
-    size_t z;
-    *ar >> title_ >> width_ >> z;
-    //card_.reserve(z);
-    for (size_t i = 0U; i < z; ++i)
-      card_.emplace_back(new Card(ar));
+    *ar >> title_ >> width_;
   }
   void Column::Serialize(CArchive* ar) const
   {
     *ar << ID_;
-
-    *ar << title_ << width_ << card_.size();
-    for (const auto& c : card_) c->Serialize(ar);
+    *ar << title_ << width_;
   }
-  Column::~Column(void) noexcept
-  {
-    for (auto& c : card_) delete c;
-  }
-
+  Column::~Column(void) noexcept {}
 
 
   CSize Column::CalcSize(CDC* pDC) const noexcept
@@ -53,12 +31,12 @@ namespace Kanban {
     bValid_ = true;
 
     size_ = { (int) width_, (int) UI::verticalspace + titleRect_.bottom + (int) UI::shadowoffset };
-    for (const auto& c : card_)
-    {
-      CSize cSize = c->CalcSize(pDC);
-      size_.cx = (std::max) (size_.cx, cSize.cx);
-      size_.cy += cSize.cy + UI::verticalspace;
-    }
+    //for (const auto& c : card_)
+    //{
+    //  CSize cSize = c->CalcSize(pDC);
+    //  size_.cx = (std::max) (size_.cx, cSize.cx);
+    //  size_.cy += cSize.cy + UI::verticalspace;
+    //}
     return size_;
   }
   void Column::SetWidth(size_t width) noexcept { width_ = width; bValid_ = false; }
@@ -79,24 +57,7 @@ namespace Kanban {
       UI::fontColumnTitle_.DrawMultiText(pDC, point + CSize(titleRect_.Width() / 2, 1), title_, titleLines_);
       pDC->SelectObject(f);
     }
-    p.y += titleRect_.Height() + UI::verticalspace;
-
-    // draw all cards
-    for (const auto& c : card_)
-    {
-      p.y += UI::verticalspace;
-      c->Draw(pDC,clip,p);
-      p.y += c->GetSize().cy;
-    }
-
     if (saveLoc) point_ = point; // buffer Column loction (absolute screen coordinates); this will be used to find the column when clicked
-  }
-
-
-  Card* Column::GetCard(const CPoint& point, CSize& offset) const noexcept
-  {
-    for (const auto& c : card_) if (c->PtInCard(point,offset)) return c;
-    return nullptr;
   }
 
   bool Column::PtInColumn(const CPoint& point) const noexcept

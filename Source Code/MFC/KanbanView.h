@@ -37,7 +37,7 @@ public:
 protected:
 private:
   // situational & display data
-  Kanban::Card* selected_{ nullptr };    // currently selected / dragged Card
+  Kanban::itCard selected_{};            // currently selected / dragged Card
   bool dragging_{ false };               // currently dragging a card
   bool resizing_{ false };               // currently resizing the view
   CPoint dragPoint_{};                   // point the Card is dragged to

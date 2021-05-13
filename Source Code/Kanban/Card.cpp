@@ -30,6 +30,9 @@ namespace Kanban {
   void Card::SetText(std::wstring t) noexcept { text_ = std::move(t); bValid_ = false; }
   void Card::SetWidth(size_t width) noexcept { width_ = width;  bValid_ = false; }
   void Card::SetColor(COLORREF color) noexcept { color_ = color; }
+  void Card::SetColumn(const itColumn& c) noexcept { column_ = c; SetWidth((*column_)->GetWidth()); }
+  itColumn Card::GetColumn(void) const noexcept { return column_; }
+
   CSize Card::GetSize(bool shadow) const noexcept
   {
     return { (int) width_ + (shadow ? (int) UI::shadowoffset : 0), rect_.Height() + (shadow ? (int) UI::shadowoffset : 0) };

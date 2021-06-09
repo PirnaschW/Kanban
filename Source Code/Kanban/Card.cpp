@@ -127,12 +127,16 @@ namespace Kanban {
 
   bool Card::PtInCard(const CPoint& point, CSize& offset) const noexcept
   {
+    assert(bValid_);
+
     offset = point - point_;
     return offset.cx >= 0 && offset.cx < (int) width_ && offset.cy >= 0 && offset.cy < rect_.Height();
   }
 
   bool Card::CardInRect(const CRect& clip, const CPoint& point) const noexcept
   {
+    assert(bValid_);
+
     return
       point.y + rect_.bottom + (int) UI::shadowoffset >= clip.top && point.y + rect_.top < clip.bottom &&
       point.x + rect_.right + (int) UI::shadowoffset >= clip.left && point.x + rect_.left < clip.right;

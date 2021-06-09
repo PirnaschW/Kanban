@@ -61,15 +61,23 @@ namespace Kanban
       UI::fontCardText_.GetCharWidths(pDC);
     }
 
-    CSize size{ UI::horizontalspace,0 };
-    for (const auto& c : column_)
+    CSize size{ UI::horizontalspace, 0 };
+    for (itColumn iColumn = column_.cbegin(); iColumn != column_.cend(); ++iColumn)
     {
-      CSize cSize = c->CalcSize(pDC);
+      CSize cSize = (*iColumn)->CalcSize(pDC);
       size.cx += cSize.cx + UI::horizontalspace;
-      size.cy = (std::max)(size.cy,cSize.cy);
+
+      // size all cards of this column
+      for (itCard icard = card_.cbegin(); icard != card_.cend(); ++icard)
+      {
+        if ((*icard)->GetColumn() == iColumn)                          // ignore Cards not in current column
+        {
+          cSize.cy += UI::verticalspace + (*icard)->CalcSize(pDC).cy;   // size the Card and increase Column height to accomodate for it
+          assert(cSize.cx >= (*icard)->GetSize().cx);
+        }
+      }
+      size.cy = (std::max)(size.cy, cSize.cy); // overall height is the height of the largest Column
     }
-    size.cy += UI::verticalspace;
-    for (itCard it = card_.cbegin(); it != card_.cend(); ++it) (*it)->CalcSize(pDC);
     return size;
   }
 

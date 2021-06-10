@@ -25,8 +25,6 @@ END_MESSAGE_MAP()
 
 CKanbanView::CKanbanView() noexcept
 {
-  // TODO: add construction code here
-
 }
 
 CKanbanView::~CKanbanView()
@@ -35,9 +33,6 @@ CKanbanView::~CKanbanView()
 
 BOOL CKanbanView::PreCreateWindow(CREATESTRUCT& cs)
 {
-  // TODO: Modify the Window class or styles here by modifying
-  //  the CREATESTRUCT cs
-
   return CScrollView::PreCreateWindow(cs);
 }
 
@@ -109,12 +104,10 @@ BOOL CKanbanView::OnPreparePrinting(CPrintInfo* pInfo)
 
 void CKanbanView::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 {
-  // TODO: add extra initialization before printing
 }
 
 void CKanbanView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 {
-  // TODO: add cleanup after printing
 }
 
 // CKanbanView diagnostics

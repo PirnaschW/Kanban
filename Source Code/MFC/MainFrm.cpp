@@ -35,7 +35,6 @@ static UINT indicators[] =
 
 CMainFrame::CMainFrame() noexcept
 {
-  // TODO: add member initialization code here
 }
 
 CMainFrame::~CMainFrame()
@@ -87,7 +86,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
   }
   m_wndStatusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
 
-  // TODO: Delete these five lines if you don't want the toolbar and menubar to be dockable
   m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
   m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
   EnableDocking(CBRS_ALIGN_ANY);
@@ -122,7 +120,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
   }
 
   // enable menu personalization (most-recently used commands)
-  // TODO: define your own basic commands, ensuring that each pulldown menu has at least one basic command.
+  // define your own basic commands, ensuring that each pulldown menu has at least one basic command.
   CList<UINT, UINT> lstBasicCommands;
 
   lstBasicCommands.AddTail(ID_FILE_NEW);
@@ -146,12 +144,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
   if( !CMDIFrameWndEx::PreCreateWindow(cs) )
     return FALSE;
-  // TODO: Modify the Window class or styles here by modifying
-  //  the CREATESTRUCT cs
-
-  cs.style = WS_OVERLAPPED | WS_CAPTION | FWS_ADDTOTITLE
-     | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_MAXIMIZE | WS_SYSMENU;
-
+  cs.style = WS_OVERLAPPED | WS_CAPTION | FWS_ADDTOTITLE | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_MAXIMIZE | WS_SYSMENU;
   return TRUE;
 }
 

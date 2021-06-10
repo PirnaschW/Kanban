@@ -21,7 +21,6 @@ END_MESSAGE_MAP()
 
 CChildFrame::CChildFrame() noexcept
 {
-  // TODO: add member initialization code here
 }
 
 CChildFrame::~CChildFrame()
@@ -31,11 +30,8 @@ CChildFrame::~CChildFrame()
 
 BOOL CChildFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
-  // TODO: Modify the Window class or styles here by modifying the CREATESTRUCT cs
-  if( !CMDIChildWndEx::PreCreateWindow(cs) )
-    return FALSE;
-
-  return TRUE;
+  cs.style |= WS_MAXIMIZE | WS_VISIBLE;
+  return CMDIChildWndEx::PreCreateWindow(cs);
 }
 
 // CChildFrame diagnostics

@@ -36,12 +36,9 @@ CKanbanApp::CKanbanApp() noexcept
   System::Windows::Forms::Application::SetUnhandledExceptionMode(System::Windows::Forms::UnhandledExceptionMode::ThrowException);
 #endif
 
-  // TODO: replace application ID string below with unique ID string; recommended
-  // format for string is CompanyName.ProductName.SubProduct.VersionInformation
-  SetAppID(_T("Kanban.AppID.NoVersion"));
+  // recommended format for string is CompanyName.ProductName.SubProduct.VersionInformation
+  SetAppID(_T("WP.Kanban.1000"));
 
-  // TODO: add construction code here,
-  // Place all significant initialization in InitInstance
 }
 
 // The one and only CKanbanApp object
@@ -66,9 +63,7 @@ BOOL CKanbanApp::InitInstance()
   // of your final executable, you should remove from the following
   // the specific initialization routines you do not need
   // Change the registry key under which our settings are stored
-  // TODO: You should modify this string to be something appropriate
-  // such as the name of your company or organization
-  SetRegistryKey(_T("Local AppWizard-Generated Applications"));
+  SetRegistryKey(_T("WP//Kanban"));
   LoadStdProfileSettings(16);  // Load standard INI file options (including MRU)
 
 
@@ -129,7 +124,6 @@ BOOL CKanbanApp::InitInstance()
 
 int CKanbanApp::ExitInstance()
 {
-  //TODO: handle additional resources you may have added
   return CWinAppEx::ExitInstance();
 }
 

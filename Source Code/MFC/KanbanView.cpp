@@ -18,7 +18,6 @@ BEGIN_MESSAGE_MAP(CKanbanView, CScrollView)
   ON_WM_LBUTTONDBLCLK()
   ON_WM_MOUSEMOVE()
   ON_WM_CHAR()
-  ON_WM_SIZE()
   ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
@@ -56,17 +55,18 @@ void CKanbanView::OnDraw(CDC* pDC)
   {
     CRect client{};
     GetClientRect(&client);
-  //    ValidateRect(oldsize_);
     if (client.bottom > oldsize_.bottom)
     {
       CRect b{ 0,oldsize_.bottom,oldsize_.right,client.bottom };
       pDoc->board_->Draw(pDC, b);
-//      InvalidateRect(b, true);
     }
     if (client.right > oldsize_.right)
     {
+      //CSize Total = GetTotalSize();
+      //CSize size = GetDocument()->board_->CalcSize(pDC);
+      //SetScrollSizes(MM_TEXT, size);
+
       CRect r{ oldsize_.right,0,client.right,client.bottom };
-      //InvalidateRect(r, true);
       pDoc->board_->Draw(pDC, r);
     }
     oldsize_ = client;
@@ -245,31 +245,6 @@ void CKanbanView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 // ?
 }
-
-
-void CKanbanView::OnSize(UINT nType, int cx, int cy)
-{
- // CScrollView::OnSize(nType, cx, cy);
-  //if (resizing_)
-  //{
-  //  ValidateRect(oldsize_);
-  //  CRect client{};
-  //  GetClientRect(&client);
-  //  if (client.bottom > oldsize_.bottom)
-  //  {
-  //    CRect b{ 0,oldsize_.bottom,client.right,client.bottom };
-  //    InvalidateRect(b, true);
-  //  }
-  //  if (client.right > oldsize_.right)
-  //  {
-  //    CRect r{ oldsize_.right,0,client.right,client.bottom };
-  //    InvalidateRect(r, true);
-  //  }
-
-  //  oldsize_ = client;
-  //}
-}
-
 
 void CKanbanView::OnResizeStart()
 {

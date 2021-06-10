@@ -58,7 +58,6 @@ protected:
   //}}AFX_MSG
   DECLARE_MESSAGE_MAP()
 public:
-    afx_msg void OnSize(UINT nType, int cx, int cy);
     afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 };
 
